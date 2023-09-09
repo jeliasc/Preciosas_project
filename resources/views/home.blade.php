@@ -10,11 +10,6 @@
 
 {{-- Notificaciones --}}
 
-    @if(Session::has('home'))
-        <p class="bg-primary">
-            {{session('home')}}
-        </p>
-    @endif
     @if(Session::has('eAuth'))
         <p class="bg-primary">
             {{session('eAuth')}}

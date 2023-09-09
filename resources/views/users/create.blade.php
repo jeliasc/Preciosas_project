@@ -7,11 +7,41 @@
 @stop
 
 @section('content')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+{!! Form::open(['method' => 'post', 'action'=>'App\Http\Controllers\UsersController@store']) !!}
+<table class="table table-striped ">
+    <tbody>
+        <tr>
+            <td><label>Nombre</label></td>
+            <td><input class="form-control" type="text" id="name" name="name" placeholder="Clic aquí e ingrese el nombre" required></td>
+        </tr>
+        <tr>
+            <td><label>Role</label></td>
+            <td>
+                <select name="role_id" id="role_id" class="form-select">
+                    <option value="">Clic aquí y seleccione un role</option>
+                    @foreach($roles as $role)
+                        <option value="{{$role->id}}">{{$role->name}}</option>
+                    @endforeach
+                </select> 
+            </td>
+        </tr>
+        <tr>
+            <td><label>E-mail</label></td>
+            <td><input type="text" name="email" id="email" class="form-control" placeholder="Clic aquí e ingrese el e-mail" required></td>
+        </tr> 
+        <tr>
+            <td><label>Password:</label></td>
+            <td><input type="text" name="password" id="password" class="form-control" placeholder="Clic aquí e ingrese la contraseña" required></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button class="btn btn-success" type="submit" name="enviar">Enviar</button>
+                <button class="btn btn-danger" type="reset" name="cancelar">Cancelar</button>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+{!! Form::close() !!}
 @stop
 
 @section('css')

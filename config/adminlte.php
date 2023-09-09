@@ -319,14 +319,14 @@ return [
             'submenu' => [
                 [
                     'text' => 'Ver Usuarios',
-                    'route'  => 'indexUsuarios',
+                    'route'  => 'usuariosIndex',
                     'icon'    => 'fas fa-duotone fa-eye',
                     'can'  => 'ver usuarios',
   
                 ],
                 [
                     'text' => 'Crear Usuarios',
-                    'url'  => 'crearUsuarios',
+                    'route'  => 'crearUsuario',
                     'icon'    => 'fas fa-light fa-user-plus',
                     'can'  => 'crear usuarios',
                 ],

@@ -9,40 +9,69 @@
 @section('content')
 
     <!-- Modal nuevo clientre -->
-
-    <p><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Nuevo</button></p>
-    {!! Form::open() !!}
+    @can('crear usuarios')
+        <p><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Nuevo</button></p>
+    @endcan
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Nuevo usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
-                <div class="mb-3">
-                    <label for="recipient-name" class="col-form-label">Recipient:</label>
-                    <input type="text" class="form-control" id="recipient-name">
+                {!! Form::open(['method' => 'post', 'action'=>'App\Http\Controllers\UsersController@store']) !!}
+                    <table class="table table-striped ">
+                        <tbody>
+                            <tr>
+                                <td><label>Nombre</label></td>
+                                <td><input class="form-control" type="text" id="name" name="name" placeholder="Clic aquí e ingrese el nombre" required></td>
+                            </tr>
+                            <tr>
+                                <td><label>Role</label></td>
+                                <td>
+                                    <select name="role_id" id="role_id" class="form-select" required>
+                                        <option value="">Clic aquí y seleccione un role</option>
+                                        @foreach($roles as $role)
+                                            <option value="{{$role->id}}">{{$role->name}}</option>
+                                        @endforeach
+                                    </select> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>E-mail</label></td>
+                                <td><input type="text" name="email" id="email" class="form-control" placeholder="Clic aquí e ingrese el e-mail" required></td>
+                            </tr> 
+                            <tr>
+                                <td><label>Password:</label></td>
+                                <td><input type="text" name="password" id="password" class="form-control" placeholder="Clic aquí e ingrese la contraseña" required></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="mb-3">
-                    <label for="message-text" class="col-form-label">Message:</label>
-                    <textarea class="form-control" id="message-text"></textarea>
+                <div class="modal-footer">                    
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" type="submit" name="enviar">Enviar</button>
                 </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">Enviar</button>
+                </div>
             </div>
             </div>
-        </div>
-        </div>
-    {!! Form::close() !!}
+        {!! Form::close() !!}
 
     <!-- Fin de modal nuevo clientre -->
 
     {{-- Inicia formulario de index --}}
+    
+    @if(Session::has('usuarioCreado'))
+        <p class="bg-primary">
+            {{session('usuarioCreado')}}
+        </p>
+    @endif
+    @if(Session::has('usuarioActualizado'))
+        <p class="bg-primary">
+            {{session('usuarioActualizado')}}
+        </p>
+    @endif
  
     {!! Form::open(['url' => 'App\Http\Controllers\UsersController@index']) !!}
         <table id="myTable" class="table table-striped dt-responsive nowrap" style="width:100%">
@@ -55,6 +84,7 @@
                     <th scope="col">Estado</th>
                     <th scope="col">Creado</th>
                     <th scope="col">Actualizado</th>
+                    <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -73,6 +103,27 @@
                             <td>{{$user->estado->nombre}}</td>
                             <td>{{$user->created_at}}</td>
                             <td>{{$user->updated_at}}</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        @can('editar usuarios')
+                                        <a href="{{ route('editarUsuario', ['id'=>$user->id]) }}" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@mdo"><i class="fa fa-pencil-square-o" title="Editar Usuario" aria-hidden="true"></i></a>
+                                        @endcan
+                                    </div>
+                                    <div class="col-lg-6">
+                                        @can('eliminar usuarios')
+                                            <a href="#">
+                                                @if ($user->estado_id == 2)
+                                                    <i class="fa fa-check-square-o" aria-hidden="true" title="Habilitar Usuario"></i>
+                                                @else
+                                                    <i class="fa fa-ban" aria-hidden="true" title="Deshabilitar Usuario"></i>
+                                                @endif
+                                            </a>
+                                        @endcan
+                                    </div>
+                                </div>
+                            </td>
+
                         </tr>
                     @endforeach
                 @endif
@@ -81,6 +132,51 @@
     {!! Form::close() !!}
 
     {{-- Fin de formulario index --}}
+
+    <!-- Modal editar clientre -->
+
+        <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Editar usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {!! Form::model($user,['method' => 'post', 'action'=>['App\Http\Controllers\UsersController@update', $user->id]]) !!}
+                    <table class="table table-striped ">
+                        <tbody>
+                            <tr>
+                                <td><label>Nombre</label></td>
+                                <td><input class="form-control" type="text" id="name" name="name" required value="{{$user->name}}"></td>
+                            </tr>
+                            <tr>
+                                <td><label>Role</label></td>
+                                <td>
+                                    <select name="role_id" id="role_id" class="form-select" required>
+                                        @foreach($roles as $role)
+                                            <option value="{{$role->id}}">{{$role->name}}</option>
+                                        @endforeach
+                                    </select> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>E-mail</label></td>
+                                <td><input type="text" name="email" id="email" class="form-control" required value="{{$user->email}}"></td>
+                            </tr> 
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">                    
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" type="submit" name="enviar">Enviar</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        {!! Form::close() !!}
+
+    <!-- Fin de modal editar clientre -->
 
 @stop
 
