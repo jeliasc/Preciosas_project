@@ -307,30 +307,16 @@ return [
             'text' => 'search',
         ],
         [
-            'text' => 'Dashboard',
+            'text' => 'INICIO',
             'route'  => 'home',
             'icon' => 'fas fa-fw fa-home',
         ],
         ['header' => 'CONFIGURACIÓN DE LA CUENTA'],
         [
-            'text'    => 'USUARIOS',
+            'text' => 'USUARIOS',
+            'route'  => 'usuariosIndex',
+            'icon' => 'fas fa fa-users',
             'can'  => 'ver usuarios',
-            'icon'    => 'fas fa fa-users', 
-            'submenu' => [
-                [
-                    'text' => 'Ver Usuarios',
-                    'route'  => 'usuariosIndex',
-                    'icon'    => 'fas fa-duotone fa-eye',
-                    'can'  => 'ver usuarios',
-  
-                ],
-                [
-                    'text' => 'Crear Usuarios',
-                    'route'  => 'crearUsuario',
-                    'icon'    => 'fas fa-light fa-user-plus',
-                    'can'  => 'crear usuarios',
-                ],
-            ],
         ], 
         [
             'text' => 'profile',

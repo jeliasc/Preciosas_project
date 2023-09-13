@@ -27,7 +27,7 @@ class UsersController extends Controller
                 return view('users.index', compact('users','roles'));
             } catch (\Throwable $th) {
                 $error = 'Eerror';
-                $error = $error.''.$th->getMessage();
+                $error = $error.' '.$th->getMessage();
                 Session::flash('eAuth', $error);
                 return redirect('home');
             }
@@ -47,7 +47,7 @@ class UsersController extends Controller
                 return view('users.create', compact('roles'));
             } catch (\Throwable $th) {
                 $error = 'Error';
-                $error = $error.''.$th->getMessage();
+                $error = $error.' '.$th->getMessage();
                 Session::flash('eAuth', $error);
                 return redirect('home');
             }
@@ -71,7 +71,7 @@ class UsersController extends Controller
                 return redirect('usuariosIndex');
             } catch (\Throwable $th) {
                 $error = 'Error';
-                $error = $error.''.$th->getMessage();
+                $error = $error.' '.$th->getMessage();
                 Session::flash('eAuth', $error);
                 return redirect('home');
             }
@@ -81,27 +81,6 @@ class UsersController extends Controller
         }
     }
 
-    public function edit($id){
-        if(Auth::user()->can('editar usuarios')){
-            try {
-                $roles = DB::table('roles')
-                ->orderBy('name', 'asc')
-                ->where('estado_id','1')
-                ->get(); 
-                $user=User::findOrFail($id);
-                return view('user.index', compact('user','roles')); 
-            } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error.''.$th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
-            }
-            }else{
-            Session::flash('Error, permiso denegado');
-            return redirect('home');
-        }
-    }
-    
     public function update(Request $request, $id){
         if(Auth::user()->can('editar usuarios')){
             DB::connection('mysql')->beginTransaction();
@@ -109,15 +88,17 @@ class UsersController extends Controller
                 $role = Role::where('id', $request->role_id)->first();
                 $user = User::findOrFail($id);
                 $datos = $request->all();
-                $user->update($datos);
+                
+                $user->update($datos); 
                 $user->roles()->update(['role_id'=>$role->id]);
-                $user->assignRole($role);
-                DB::connection()->commit();
+                $user->assignRole($role); 
+                DB::connection('mysql')->commit();
                 Session::flash('usuarioActualizado','El usuario ha sido actualizado con éxito');
                 return redirect('usuariosIndex');
+
             } catch (\Throwable $th) {
                 $error = 'Error';
-                $error = $error.''.$th->getMessage();
+                $error = $error.' '.$th->getMessage();
                 Session::flash('eAuth', $error);
                 return redirect('home');
             }

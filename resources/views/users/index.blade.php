@@ -10,9 +10,9 @@
 
     <!-- Modal nuevo clientre -->
     @can('crear usuarios')
-        <p><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Nuevo</button></p>
+        <p><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal" data-bs-whatever="@mdo">Nuevo</button></p>
     @endcan
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
@@ -107,8 +107,63 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         @can('editar usuarios')
-                                        <a href="{{ route('editarUsuario', ['id'=>$user->id]) }}" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@mdo"><i class="fa fa-pencil-square-o" title="Editar Usuario" aria-hidden="true"></i></a>
+
+                                         <!-- Modal editar clientre -->   
+
+                                        <a href="" id="btn-modal-editar" type="button" data-bs-toggle="modal" data-bs-target="#updateModal{{$user->id}}" data-bs-whatever="@mdo"><i class="fa fa-pencil-square-o" title="Editar Usuario" aria-hidden="true"></i></a>
                                         @endcan
+                                        <div class="modal fade" id="updateModal{{$user->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Editar usuario</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    {!! Form::model($user, ['method' => 'post', 'action'=>['App\Http\Controllers\UsersController@update', $user->id]]) !!}
+                                                    <table class="table table-striped dt-responsive nowrap" style="width:100%">
+                                                        <tr>
+                                                            <td>{!! Form::label('name', 'Nombre') !!}</td>
+                                                            <td>{!! Form::text('name') !!}
+                                                                @error('name')
+                                                                <small> 
+                                                                    <strong>{{$message}}</strong>
+                                                                </small>
+                                                                @enderror
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>{!! Form::label('email', ' E-mail') !!}</td>
+                                                            <td>{!! Form::text('email') !!}
+                                                                @error('email')
+                                                                <small> 
+                                                                    <strong>{{$message}}</strong>
+                                                                </small>
+                                                                @enderror
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><label>Role</label></td>
+                                                            <td>
+                                                                <select name="role_id" id="role_id" class="form-select" required>
+                                                                    @foreach($roles as $role)
+                                                                        <option value="{{$role->id}}">{{$role->name}}</option>
+                                                                    @endforeach
+                                                                </select> 
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    </div>
+                                                    <div class="modal-footer">                    
+                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button class="btn btn-primary" type="submit" name="enviar">Actualizar</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            {!! Form::close() !!}
+                                            
+                                        <!-- Fin de modal editar clientre -->
                                     </div>
                                     <div class="col-lg-6">
                                         @can('eliminar usuarios')
@@ -123,7 +178,6 @@
                                     </div>
                                 </div>
                             </td>
-
                         </tr>
                     @endforeach
                 @endif
@@ -132,52 +186,7 @@
     {!! Form::close() !!}
 
     {{-- Fin de formulario index --}}
-
-    <!-- Modal editar clientre -->
-
-        <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Editar usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                {!! Form::model($user,['method' => 'post', 'action'=>['App\Http\Controllers\UsersController@update', $user->id]]) !!}
-                    <table class="table table-striped ">
-                        <tbody>
-                            <tr>
-                                <td><label>Nombre</label></td>
-                                <td><input class="form-control" type="text" id="name" name="name" required value="{{$user->name}}"></td>
-                            </tr>
-                            <tr>
-                                <td><label>Role</label></td>
-                                <td>
-                                    <select name="role_id" id="role_id" class="form-select" required>
-                                        @foreach($roles as $role)
-                                            <option value="{{$role->id}}">{{$role->name}}</option>
-                                        @endforeach
-                                    </select> 
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><label>E-mail</label></td>
-                                <td><input type="text" name="email" id="email" class="form-control" required value="{{$user->email}}"></td>
-                            </tr> 
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">                    
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary" type="submit" name="enviar">Enviar</button>
-                </div>
-                </div>
-            </div>
-            </div>
-        {!! Form::close() !!}
-
-    <!-- Fin de modal editar clientre -->
-
+ 
 @stop
 
 @section('css')
@@ -187,7 +196,8 @@
 @section('js')
     <script> console.log('Hi!'); </script>
     <script> $('#myTable').DataTable(); </script>
-
+    <script src="{{ asset('js/userUpdate.js') }}"></script>
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
 @stop
 
 
