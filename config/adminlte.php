@@ -449,42 +449,42 @@ return [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//code.jquery.com/jquery-3.5.1.js',
+                    'location' => '//code.jquery.com/jquery-3.7.0.js',
                 ],
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js',
+                    'location' => '//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js',
                 ],
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.13.2/js/dataTables.bootstrap5.min.js',
+                    'location' => '//cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js',
                 ],
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js',
+                    'location' => '//cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js',                  
                 ],
                 [
                     'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/responsive/2.4.0/js/responsive.bootstrap5.min.js',
+                    'asset' => false, 
+                    'location' => '//cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css',
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.13.2/css/dataTables.bootstrap5.min.css',
+                    'location' => '//cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/responsive/2.4.0/css/responsive.bootstrap5.min.css',
+                    'location' => '//cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css',
                 ], 
             ],
         ],
@@ -552,10 +552,16 @@ return [
                     'location' => '//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js',
                 ],
                 [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js',
+                ],
+                [
                     'type' => 'css',
                     'asset' => false,
                     'location' => '//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css',
                 ],
+                
             ],
         ],
         'font-awesome' => [

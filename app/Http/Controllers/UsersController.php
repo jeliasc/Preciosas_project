@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Role;
 
@@ -17,14 +18,13 @@ class UsersController extends Controller
     }
 
     public function index(){
+
         if (Auth::user()->can('ver usuarios')) {
             try {
-                $users=User::all();
-                $roles = DB::table('roles')
-                ->orderBy('name', 'asc')
-                ->where('estado_id','1')
-                ->get(); 
-                return view('users.index', compact('users','roles'));
+                $roles = Role::all();
+                $users = User::all();
+                return view('users.index', compact('roles', 'users'));    
+
             } catch (\Throwable $th) {
                 $error = 'Eerror';
                 $error = $error.' '.$th->getMessage();
@@ -81,7 +81,35 @@ class UsersController extends Controller
         }
     }
 
+    public function edit(Request $request, $id){
+        $mensaje = '';
+        $error = true;
+        $data = [];
+        $roles = Role::get();
+        if(Auth::user()->can('editar usuarios')){
+            try {
+                $data = User::where('id',$id)->first();
+                if(empty($data)){
+                    $error = true;
+                    $mensaje = 'Usuario no existe';
+                }else{
+                    $error = false;
+                    $mensaje ='Consulta exitsa';
+                }
+
+            } catch (\Throwable $th) {
+                $error = true;
+                $mensaje = 'Error '.$th->getMessage();
+            }
+        }else{
+            $error = true;
+            $mensaje = 'Permiso denegado';
+        }
+        return Response::json(array('error' => $error, 'mensaje' => $mensaje,'data' => $data, 'roles' => $roles));
+    }
+
     public function update(Request $request, $id){
+        
         if(Auth::user()->can('editar usuarios')){
             DB::connection('mysql')->beginTransaction();
             try {
