@@ -44,7 +44,7 @@
                             <td>
                                 <div class="row">
                                     <div class="col-md-6">
-                                    <a  class="btn-modal-editar" type="button"  onclick="return userEdit({{$user->id}})"> <i class="fa fa-pencil-square-o" title="Editar Usuario" aria-hidden="true"></i></a>
+                                    <a  class="btn-modal-editar" type="button" onclick="return userEdit({{$user->id}})"> <i class="fa fa-pencil-square-o" title="Editar Usuario" aria-hidden="true"></i></a>
                                     </div>
                                     <div class="col-md-6">
                                         @can('eliminar usuarios')

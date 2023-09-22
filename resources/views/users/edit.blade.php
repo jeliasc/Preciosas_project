@@ -8,13 +8,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                {!! Form::open (['url' => '']) !!}
-                    <div class="table table-responsive">
+                <form id="editForm">
+                @CSRF
+                <div class="table table-responsive">
                         <table class="table">
                             <tbody>
                                 <tr>
+                                    <td><label hidden>Id</label></td>
+                                    <td><input class="form-control" type="text" id="id" name="id"></td>
+                                </tr>
+                                <tr>
                                     <td><label>Nombre</label></td>
-                                    <td><input class="form-control" type="text" id="name" name="name" value=""></td>
+                                    <td><input class="form-control" type="text" id="name" name="name"></td>
                                 </tr>
                                 <tr>
                                     <td><label>Role</label></td>
@@ -25,20 +30,20 @@
                                 </tr>
                                 <tr>
                                     <td><label>E-mail</label></td>
-                                    <td><input type="text" name="email" id="email" class="form-control" value=""></td>
+                                    <td><input type="text" name="email" id="email" class="form-control"></td>
                                 </tr>
                             </tbody> 
                             <tfoot>
                                 <tr> 
                                     <td style="text-align: right" colspan="2">      
                                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>         
-                                        <button class="btn btn-primary" type="submit" name="enviar">Actualizar</button>
+                                        <a class="btn btn-primary" onclick="return userUpdate()">Actualizar</a>
                                     </td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
-                {!! Form::close() !!}
+                </form>
             </div>
             </div>
         </div>

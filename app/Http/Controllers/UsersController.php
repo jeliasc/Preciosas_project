@@ -85,16 +85,16 @@ class UsersController extends Controller
         $mensaje = '';
         $error = true;
         $data = [];
-        $roles = Role::get();
         if(Auth::user()->can('editar usuarios')){
             try {
                 $data = User::where('id',$id)->first();
+                $roles = $data->roles;
                 if(empty($data)){
                     $error = true;
                     $mensaje = 'Usuario no existe';
                 }else{
                     $error = false;
-                    $mensaje ='Consulta exitsa';
+                    $mensaje ='Consulta exitosa';
                 }
 
             } catch (\Throwable $th) {
@@ -113,27 +113,39 @@ class UsersController extends Controller
         if(Auth::user()->can('editar usuarios')){
             DB::connection('mysql')->beginTransaction();
             try {
+                $mensaje = '';
+                $error = true;
+                $data = [];
+                $entrada = $request->all();
+                unset($entrada['role_id']);
+                unset($entrada['id']);
+                unset($entrada['_token']);
+
                 $role = Role::where('id', $request->role_id)->first();
                 $user = User::findOrFail($id);
-                $datos = $request->all();
-                
-                $user->update($datos); 
-                $user->roles()->update(['role_id'=>$role->id]);
-                $user->assignRole($role); 
-                DB::connection('mysql')->commit();
-                Session::flash('usuarioActualizado','El usuario ha sido actualizado con éxito');
-                return redirect('usuariosIndex');
+
+                if(empty($request)){
+                    $error = true;
+                    $mensaje = 'Error, no se pudo actualizar el usuario';
+                }else{
+                    
+                    $user->update($entrada); 
+                    $user->roles()->update(['role_id'=>$role->id]);
+                    $user->assignRole($role); 
+                    DB::connection('mysql')->commit();
+                    $error = false;
+                    $mensaje ='Usuario actualizado con éxito';
+                }
 
             } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error.' '.$th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
+                $error = true;
+                $mensaje = 'Error '.$th->getMessage();
             }
 
         }else{
-            Session::flash('Error, permiso denegado');
-            return redirect('home');
+            $error = true;
+            $mensaje = 'Permiso denegado';
         }
+        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
     }
 }
