@@ -1,0 +1,3 @@
+$('#UserTable').DataTable( {
+    responsive: true
+} );

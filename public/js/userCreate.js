@@ -1,10 +1,8 @@
-function userEdit(id) {
+function userCreate() {
     $.ajax({
         type: "get",
         dataType: "json",
-        headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "editarUsuario/"+id,
-        data: {id},
+        url: "crearUsuario",
 
         success: function (response) {
             if(response.error){
@@ -15,40 +13,24 @@ function userEdit(id) {
                     footer: ''
                   });  
 
-            }else{ 
-                const user = response.user;
+            }else{
                 const roles = response.roles;
-                const role_user= response.role_user;
+
+                let texto = '';
 
                 console.log(roles);
-                console.log(role_user);
-                console.log(user);
 
-                let selected = '';
-                let texto = '';
-                let role_id = '';
-                role_id = role_user;
+                $("#role_id_create" ).empty();
+                texto += '<option value="">Elija una opcion</option>';            
 
-                $("#role_id" ).empty();
-                texto += '<option value="">Elija una opción</option>';
-                $('#id').val(user.id).hide();
-                $('#name').val(user.name);
-                $('#email').val(user.email);
-
-                roles.forEach(function(role) {
-                    if (role_id != null && role_id != '') {
-                        if(role.id == role_user.id_role){
-                                selected = 'selected';
-                                texto += '<option '+selected+' value="'+role.id+'">'+role.name+'</option>';
-                        }else{
-                            texto += '<option value="'+role.id+'">'+role.name+'</option>';
-                        }
-                    }else{
+                roles.forEach(role => {
+                    if(role.id != ''){
                         texto += '<option value="'+role.id+'">'+role.name+'</option>';
                     }
                 });
-                $("#role_id" ).append(texto);
-                $('#updateModal').modal('show'); 
+                $("#role_id_create" ).append(texto);
+                $('#createModal').modal('show');   
+
             }
         },error: function (jqXHR, estado, error){
             console.log(estado);
@@ -57,17 +39,16 @@ function userEdit(id) {
         }
     })   
 }
-       
-function userUpdate() {
 
-    var form = $('#editForm').serialize();
-    var id = $('#id').val();
+function userInsert() {
+
+    var form = $('#createForm').serialize();
 
     $.ajax({
         type: "post",
         dataType: "json",
         headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "usuariosUpdate/"+id,
+        url: "insertarUsuario",
         data: form,   
 
         success: function (response) {
@@ -103,13 +84,3 @@ function userUpdate() {
         }
     })                       
 }
-
-
-
-   
-
-
-
-
-
-

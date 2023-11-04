@@ -64,7 +64,7 @@ return [
     */
 
     'logo' => '<b>Preciosas</b>',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo_img' => 'vendor/adminlte/dist/img/preciosas6.jpg',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -424,68 +424,48 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
-            'files' => [
-                [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
-                ],
-                [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js',
-                ],
-                [
-                    'type' => 'css',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
-                ],
-            ],
-        ],
-        'Datatables' => [
             'active' => true,
-            'files' => [
+            'files' => [  
                 [
-                    'type' => 'js',
+                    'type' => 'css',
                     'asset' => false,
-                    'location' => '//code.jquery.com/jquery-3.7.0.js',
-                ],
-                [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js',
-                ],
-                [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js',
-                ],
-                [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js',                  
-                ],
-                [
-                    'type' => 'js',
-                    'asset' => false, 
-                    'location' => '//cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js',
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css',
+                    'location' => '//cdn.datatables.net/1.13.2/css/dataTables.bootstrap5.min.css',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css',
-                ],
-                [
-                    'type' => 'css',
-                    'asset' => false,
-                    'location' => '//cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css',
+                    'location' => '//cdn.datatables.net/responsive/2.4.0/css/responsive.bootstrap5.min.css',
                 ], 
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//code.jquery.com/jquery-3.5.1.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/1.13.2/js/dataTables.bootstrap5.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdn.datatables.net/responsive/2.4.0/js/responsive.bootstrap5.min.js',
+                ],
             ],
         ],
         'Select2' => [

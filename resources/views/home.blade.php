@@ -3,24 +3,40 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+<div  class="text-right" style="margin-right: 2em">
+    @if (Route::has('login'))
+        <div class="row">
+            @auth
+                <a href="{{ url('home') }}" class="text-sm text-gray-700 dark:text-gray-500 underline"></a>
+            @else
+            <div  class="col-md-11">                
+                <h6><a href="{{ route('login') }}" class="btn btn-outline-success" type="button">Login</a></h6>
+            </div>
+                @if (Route::has('register'))
+            <div  class="col-md-1">
+                    <h6><a href="{{ route('register') }}" class="btn btn-outline-danger" type="button">Register</a></h6>
+            </div>
+                @endif
+            @endauth
+        </div>
+    @endif
+</div>
+
 @stop
 
 @section('content')
-
-{{-- Notificaciones --}}
-
-    @if(Session::has('eAuth'))
-        <p class="bg-primary">
-            {{session('eAuth')}}
-        </p>
-    @endif
-
-{{-- Fin Notificaciones --}}
+<style>
+    #img{
+        float: center;
+        margin-top: 0px;
+    }
+</style>
+<div id="img">   
+    <p align="center"><img src="vendor/adminlte/dist/img/preciosas6.jpg" width="100%"/></p>
+</div>
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
 @stop
 
 @section('js')

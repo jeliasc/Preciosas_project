@@ -5,12 +5,12 @@
 @section('content_header')
     <h1>Usuarios</h1>
 @stop
-
 @section('content')
-@include('users.edit')
 
     {{-- formulario de index usuarios--}}   
-    
+
+        <p><a class="btn btn-outline-success" type="button" onclick="return userCreate()">Nuevo</a></p>
+
     {!! Form::open(['url' => 'App\Http\Controllers\UsersController@index']) !!}
         <table id="UserTable" class="table table-striped dt-responsive nowrap" style="width:100%">
             <thead>
@@ -48,13 +48,11 @@
                                     </div>
                                     <div class="col-md-6">
                                         @can('eliminar usuarios')
-                                            <a href="#">
                                                 @if ($user->estado_id == 2)
-                                                    <i class="fa fa-check-square-o" aria-hidden="true" title="Habilitar Usuario"></i>
+                                                    <a  class="btn-modal-editar" type="button" onclick="return userDelete({{$user->id}})"><i class="fa fa-check-square-o" aria-hidden="true" title="Habilitar Usuario"></i></a>
                                                 @else
-                                                    <i class="fa fa-ban" aria-hidden="true" title="Deshabilitar Usuario"></i>
+                                                    <a  class="btn-modal-editar" type="button" onclick="return userDelete({{$user->id}})"><i class="fa-solid fa-ban" aria-hidden="true" title="Deshabilitar Usuario"></i></a>    
                                                 @endif
-                                            </a>
                                         @endcan
                                     </div>
                                 </div>
@@ -68,15 +66,20 @@
  
     {{-- Fin de formulario index usuarios --}}
 
+@include('users.edit')
+@include('users.create')
+
 @stop
 
 @section('css')
+
 @stop
 
 @section('js')
-    <script> $('#UserTable').DataTable(); </script>
+    <script src="{{ asset('js/dataTable/dataTable.js') }}"></script>
+    <script src="{{ asset('js/userCreate.js') }}"></script>
     <script src="{{ asset('js/userUpdate.js') }}"></script>
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/userDelete.js') }}"></script>
 @stop
 
 

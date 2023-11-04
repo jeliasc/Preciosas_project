@@ -1,53 +1,70 @@
-@extends('adminlte::page')
+    <!-- Modal crear usuario -->   
 
-@section('title', 'Crear_Usuario')
-
-@section('content_header')
-    <h1>Crear Usuario</h1>
-@stop
-
-@section('content')
-{!! Form::open(['method' => 'post', 'action'=>'App\Http\Controllers\UsersController@store']) !!}
-<table class="table table-striped ">
-    <tbody>
-        <tr>
-            <td><label>Nombre</label></td>
-            <td><input class="form-control" type="text" id="name" name="name" placeholder="Clic aquí e ingrese el nombre" required></td>
-        </tr>
-        <tr>
-            <td><label>Role</label></td>
-            <td>
-                <select name="role_id" id="role_id" class="form-select">
-                    <option value="">Clic aquí y seleccione un role</option>
-                    @foreach($roles as $role)
-                        <option value="{{$role->id}}">{{$role->name}}</option>
-                    @endforeach
-                </select> 
-            </td>
-        </tr>
-        <tr>
-            <td><label>E-mail</label></td>
-            <td><input type="text" name="email" id="email" class="form-control" placeholder="Clic aquí e ingrese el e-mail" required></td>
-        </tr> 
-        <tr>
-            <td><label>Password:</label></td>
-            <td><input type="text" name="password" id="password" class="form-control" placeholder="Clic aquí e ingrese la contraseña" required></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <button class="btn btn-success" type="submit" name="enviar">Enviar</button>
-                <button class="btn btn-danger" type="reset" name="cancelar">Cancelar</button>
-            </td>
-        </tr>
-    </tbody>
-  </table>
-{!! Form::close() !!}
-@stop
-
-@section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
-@stop
-
-@section('js')
-    <script> console.log('Hi!'); </script>
-@stop
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content my-sm-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Crear usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createForm">
+                    @CSRF
+                    <div class="table table-responsive">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td><label>Nombre</label></td>
+                                        <td><input class="form-control" type="text" id="name_create" name="name">
+                                            @error('name')
+                                                <small> 
+                                                    <strong>{{$message}}</strong>
+                                                </small>
+                                            @enderror
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>E-mail</label></td>
+                                        <td><input type="text" name="email" id="email_create" class="form-control" required>
+                                            @error('email')
+                                                <small> 
+                                                    <strong>{{$message}}</strong>
+                                                </small>
+                                            @enderror
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label>Password</label></td>
+                                        <td><input name="password" id="password_create" class="form-control" type="password" autocomplete="off"></td>
+                                        @error('password')
+                                            <small> 
+                                                <strong>{{$message}}</strong>
+                                            </small>
+                                        @enderror
+                                    </tr>
+                                    <tr>
+                                        <td><label>Role</label></td>
+                                        <td>
+                                            <select name="role_id" id="role_id_create" class="form-select">
+                                                <option value=""></option>
+                                            </select> 
+                                        </td>
+                                    </tr>
+                                </tbody> 
+                                <tfoot>
+                                    <tr> 
+                                        <td style="text-align: right" colspan="2">      
+                                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>         
+                                            <a class="btn btn-outline-primary" onclick="return userInsert()">Enviar</a>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+    
+    <!-- Fin de modal crear usuario -->    

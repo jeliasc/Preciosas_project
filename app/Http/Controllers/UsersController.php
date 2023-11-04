@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UsersRequest;
+use App\Http\Requests\UsersUpdateRequest;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -40,56 +43,78 @@ class UsersController extends Controller
     public function create(){
         if(Auth::user()->can('crear usuarios')){
             try {
-                $roles = DB::table('roles')
-                ->orderBy('name', 'asc')
-                ->where('estado_id','1')
-                ->get(); 
-                return view('users.create', compact('roles'));
+                $mensaje = '';
+                $error = true;
+                $roles = Role::all ();
+                if(empty($roles)){
+                    $error = true;
+                    $mensaje = 'Roles vacíos';
+                }else{
+                    $error = false;
+                    $mensaje ='Consulta exitosa';
+                }
+                
             } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error.' '.$th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
+                $error = true;
+                $mensaje = 'Error '.$th->getMessage();
             }
         }else{
-            Session::flash('Error, permiso denegado');
-            return redirect('home');
+            $error = true;
+            $mensaje = 'Permiso denegado';
         }
+        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'roles' => $roles));
     }
 
-    public function store(Request $request){
+    public function store(UsersRequest $request){
         if(Auth::user()->can('crear usuarios',)){
             DB::connection('mysql')->beginTransaction();
             try {
-                $role=Role::where('id', $request->role_id)->first();
-                $datos=$request->all();
-                $datos['password']=bcrypt($request->password);
-                $user=User::create($datos);
-                $user->assignRole($role);
-                DB::connection('mysql')->commit();
-                Session::flash('usuarioCreado','El usuario ha sido creado con éxito');
-                return redirect('usuariosIndex');
+                $mensaje = '';
+                $error = true;
+                $entrada = $request->all();
+                unset($entrada['_token']);
+
+                $role = Role::where('id', $request->role_id)->first();
+
+                if(empty($request)){
+                    $error = true;
+                    $mensaje = 'Error, no se pudo crear el usuario';
+                }else{
+                    
+                    $entrada['password']=bcrypt($request->password);
+                    $user=User::create($entrada);
+                    $user->assignRole($role);
+                    DB::connection('mysql')->commit();
+                    $error = false;
+                    $mensaje ='Usuario creado con éxito';
+                }
             } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error.' '.$th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
+                $error = true;
+                $mensaje = 'Error '.$th->getMessage();
             }
         }else{
-            Session::flash('Error, permiso denegado');
-            return redirect('home');
+            $error = true;
+            $mensaje = 'Permiso denegado';
         }
+        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
     }
 
     public function edit(Request $request, $id){
-        $mensaje = '';
-        $error = true;
-        $data = [];
         if(Auth::user()->can('editar usuarios')){
             try {
-                $data = User::where('id',$id)->first();
-                $roles = $data->roles;
-                if(empty($data)){
+                $mensaje = '';
+                $error = true;
+                $roles=Role::all();
+                $user = User::where('id', $id)->first();
+
+                $role_user =  User::select('m.model_id as id_user', 'm.role_id as id_role')
+                ->join('model_has_roles as m', 'm.model_id', 'users.id')
+                ->where('m.model_id', $id)
+                ->get()
+                ->first();
+            
+                if(empty($user)){
                     $error = true;
                     $mensaje = 'Usuario no existe';
                 }else{
@@ -105,19 +130,16 @@ class UsersController extends Controller
             $error = true;
             $mensaje = 'Permiso denegado';
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje,'data' => $data, 'roles' => $roles));
+        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'user' => $user, 'roles' => $roles, 'role_user' => $role_user));
     }
 
-    public function update(Request $request, $id){
-        
+    public function update(UsersUpdateRequest $request, $id){
         if(Auth::user()->can('editar usuarios')){
             DB::connection('mysql')->beginTransaction();
             try {
                 $mensaje = '';
                 $error = true;
-                $data = [];
                 $entrada = $request->all();
-                unset($entrada['role_id']);
                 unset($entrada['id']);
                 unset($entrada['_token']);
 
@@ -146,6 +168,42 @@ class UsersController extends Controller
             $error = true;
             $mensaje = 'Permiso denegado';
         }
+        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+    }
+
+    public function destroy($id){
+        if (Auth::user()->can("eliminar usuarios")){
+                DB::connection('mysql')->beginTransaction();
+            try 
+            {
+                $mensaje = '';
+                $error = true;
+                $user = User::where('id',$id)->first();
+                
+                if(empty($user)){
+                    $error = true;
+                    $mensaje = 'Usuario no existe';
+                }else if($user->estado_id ==1){
+                    $error = false;
+                    $user->estado_id = 2;
+                    $mensaje ='El usuario ha sido deshabilitado con éxito';
+                } else{
+                    $error = false;
+                    $user->estado_id = 1;
+                    $mensaje ='El usuario ha sido habilitado con éxito';
+                }
+                DB::connection('mysql')->commit();
+                $user->save();
+            }catch(\Throwable $th) 
+            {
+                $error = true;
+                $mensaje = 'Error '.$th->getMessage();  
+            }
+        }else
+            {
+                $error = true;
+                $mensaje = 'Permiso denegado'; 
+            }
         return Response::json(array('error' => $error, 'mensaje' => $mensaje));
     }
 }

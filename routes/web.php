@@ -29,3 +29,4 @@ Route::get('crearUsuario', [UsersController::class, 'create'])->name('crearUsuar
 Route::post('insertarUsuario', [UsersController::class, 'store'])->name('insertarUsuario');
 Route::get('editarUsuario/{id}',[UsersController::class, 'edit'])->name('editarUsuario');
 Route::post('usuariosUpdate/{id}',[UsersController::class, 'update'])->name('usuariosUpdate');
+Route::get('eliminarUsuario/{id}',[UsersController::class, 'destroy'])->name('eliminarUsuario');
