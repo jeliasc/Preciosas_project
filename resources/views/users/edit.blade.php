@@ -29,7 +29,7 @@
                                 </tr>
                                 <tr>
                                     <td><label>E-mail</label></td>
-                                    <td><input type="text" name="email" id="email" class="form-control">
+                                    <td><input type="email" name="email" id="email" class="form-control">
                                         @error('email')
                                             <small> 
                                                 <strong>{{$message}}</strong>

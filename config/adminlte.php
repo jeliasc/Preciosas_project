@@ -310,8 +310,25 @@ return [
             'text' => 'INICIO',
             'route'  => 'home',
             'icon' => 'fas fa-fw fa-home',
+            'can'  => 'ver home',
+        ],
+        [
+            'text' => 'CATEGORÍAS',
+            'route'  => 'categoriasIndex',
+            'can'  => 'ver categorias',
+        ],
+        [
+            'text' => 'PROVEEDORES',
+            'route'  => 'proveedoresIndex',
+            'can'  => 'ver proveedores',
         ],
         ['header' => 'CONFIGURACIÓN DE LA CUENTA'],
+        [
+            'text' => 'ROLES',
+            'route'  => 'rolesIndex',
+            'icon' => 'fa-solid fa-user-gear',
+            'can'  => 'ver roles',
+        ], 
         [
             'text' => 'USUARIOS',
             'route'  => 'usuariosIndex',
@@ -322,11 +339,13 @@ return [
             'text' => 'profile',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-user',
+            'can'  => 'ver home',
         ],
         [
             'text' => 'change_password',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-lock',
+            'can'  => 'ver home',
         ],
         [
             'text'    => 'multilevel',

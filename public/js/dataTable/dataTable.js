@@ -1,3 +1,3 @@
-$('#UserTable').DataTable( {
+$('#myTable').DataTable( {
     responsive: true
 } );

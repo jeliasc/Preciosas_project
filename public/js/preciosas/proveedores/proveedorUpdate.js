@@ -1,9 +1,9 @@
-function userEdit(id) {
+function proveedorEdit(id) {
     $.ajax({
         type: "get",
         dataType: "json",
         headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "editarUsuario/"+id,
+        url: "editarProveedor/"+id,
         data: {id},
 
         success: function (response) {
@@ -16,38 +16,16 @@ function userEdit(id) {
                   });  
 
             }else{ 
-                const user = response.user;
-                const roles = response.roles;
-                const role_user= response.role_user;
+                let proveedor = response.proveedor;
 
-                console.log(roles);
-                console.log(role_user);
-                console.log(user);
+                console.log(proveedor);
 
-                let selected = '';
-                let texto = '';
-                let role_id = '';
-                role_id = role_user;
-
-                $("#role_id" ).empty();
-                texto += '<option value="">Elija una opción</option>';
-                $('#id').val(user.id).hide();
-                $('#name').val(user.name);
-                $('#email').val(user.email);
-
-                roles.forEach(function(role) {
-                    if (role_id != null && role_id != '') {
-                        if(role.id == role_user.id_role){
-                                selected = 'selected';
-                                texto += '<option '+selected+' value="'+role.id+'">'+role.name+'</option>';
-                        }else{
-                            texto += '<option value="'+role.id+'">'+role.name+'</option>';
-                        }
-                    }else{
-                        texto += '<option value="'+role.id+'">'+role.name+'</option>';
-                    }
-                });
-                $("#role_id" ).append(texto);
+                $('#id').val(proveedor.id).hide();
+                $('#nit_edit').val(proveedor.nit);
+                $('#nombre_edit').val(proveedor.nombre);
+                $('#direccion_edit').val(proveedor.direccion);
+                $('#telefono_edit').val(proveedor.telefono);
+                $('#email_edit').val(proveedor.email);
                 $('#updateModal').modal('show'); 
             }
         },error: function (jqXHR, estado, error){
@@ -58,8 +36,7 @@ function userEdit(id) {
     })   
 }
        
-function userUpdate() {
-
+function proveedorUpdate() {
     var form = $('#editForm').serialize();
     var id = $('#id').val();
 
@@ -67,7 +44,7 @@ function userUpdate() {
         type: "post",
         dataType: "json",
         headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "usuariosUpdate/"+id,
+        url: "actualizarProveedor/"+id,
         data: form,   
 
         success: function (response) {
@@ -103,13 +80,3 @@ function userUpdate() {
         }
     })                       
 }
-
-
-
-   
-
-
-
-
-
-

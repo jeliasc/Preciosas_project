@@ -25,6 +25,11 @@
 @stop
 
 @section('content')
+@if(Session::has('eAuth'))
+    <p class="bg-warning">
+        {{session('eAuth')}}
+    </p>
+@endif
 <style>
     #img{
         float: center;

@@ -1,21 +1,25 @@
-    <!-- Modal crear usuario -->       
+    <!-- Modal editar role -->   
 
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content my-sm-0">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Crear usuario</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Editar usuario</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="createForm">
+                    <form id="editForm">
                     @CSRF
                     <div class="table table-responsive">
                             <table class="table">
                                 <tbody>
+                                    <tr hidden>
+                                        <td><label hidden>Id</label></td>
+                                        <td><input class="form-control" type="text" id="id" name="id" hidden></td>
+                                    </tr>
                                     <tr>
                                         <td><label>Nombre</label></td>
-                                        <td><input class="form-control" type="text" id="name_create" name="name">
+                                        <td><input class="form-control" type="text" id="name" name="name">
                                             @error('name')
                                                 <small> 
                                                     <strong>{{$message}}</strong>
@@ -24,38 +28,23 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><label>E-mail</label></td>
-                                        <td><input type="email" name="email" id="email_create" class="form-control">
-                                            @error('email')
+                                        <td><label>Permisos</label></td>
+                                        <td> 
+                                            <div id="edit_permisos_id">
+                                            </div>                        
+                                            @error('name')
                                                 <small> 
                                                     <strong>{{$message}}</strong>
                                                 </small>
                                             @enderror
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td><label>Password</label></td>
-                                        <td><input name="password" id="password_create" class="form-control" type="password" autocomplete="off"></td>
-                                        @error('password')
-                                            <small> 
-                                                <strong>{{$message}}</strong>
-                                            </small>
-                                        @enderror
-                                    </tr>
-                                    <tr>
-                                        <td><label>Role</label></td>
-                                        <td>
-                                            <select name="role_id" id="role_id_create" class="form-select">
-                                                <option value=""></option>
-                                            </select> 
-                                        </td>
-                                    </tr>
+                                    </tr> 
                                 </tbody> 
                                 <tfoot>
                                     <tr> 
                                         <td style="text-align: right" colspan="2">      
                                             <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>         
-                                            <a class="btn btn-outline-primary" onclick="return userInsert()">Enviar</a>
+                                            <a class="btn btn-outline-primary" onclick="return roleUpdate()">Enviar</a>
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -66,5 +55,5 @@
                 </div>
             </div>
         </div>
-   
-    <!-- Fin de modal crear usuario -->    
+    
+    <!-- Fin de editar role -->    
