@@ -1,8 +1,8 @@
-function userCreate() {
+function productoCreate() {
     $.ajax({
         type: "get",
         dataType: "json",
-        url: "crearUsuario",
+        url: "crearProucto",
 
         success: function (response) {
             if(response.error){
@@ -14,19 +14,31 @@ function userCreate() {
                   });  
 
             }else{
-                const roles = response.roles;
-                let texto = '';
+                let categorias = response.categorias;
+                let proveedores = response.proveedores;
+                let textoCat = '';
+                let textoProv = '';
 
-                $("#role_id_create" ).empty();
-                texto += '<option value="">Elija una opcion</option>';            
+                $("#categoria_id" ).empty();
+                textoCat += '<option value="">Elija una opcion</option>';            
 
-                roles.forEach(role => {
-                    if(role.id != ''){
-                        texto += '<option value="'+role.id+'">'+role.name+'</option>';
+                $("#proveedor_id" ).empty();
+                textoProv += '<option value="">Elija una opcion</option>';            
+
+                categorias.forEach(categoria => {
+                    if(categoria.id != ''){
+                        textoCat += '<option value="'+categoria.id+'">'+categoria.nombre+'</option>';
                     }
                 });
 
-                $("#role_id_create" ).append(texto);
+                proveedores.forEach(proveedor=> {
+                    if(proveedor.id != ''){
+                        textoProv += '<option value="'+proveedor.id+'">'+proveedor.nombre+'</option>';
+                    }
+                });
+
+                $("#categoria_id" ).append(textoCat);
+                $("#proveedor_id" ).append(textoProv);
                 $('#createModal').modal('show');   
 
             }
@@ -38,14 +50,18 @@ function userCreate() {
     })   
 }
 
-function userInsert() {
-    var form = $('#createForm').serialize();
+function productoInsert() {
+    let frm = document.getElementById('createForm');
+    var form = new FormData(frm);
+
     $.ajax({
         type: "post",
         dataType: "json",
         headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "insertarUsuario",
-        data: form,   
+        url: "insertarProducto",
+        data: form,
+        contentType: false,
+        processData: false,   
 
         success: function (response) {
             if(response.error){

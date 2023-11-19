@@ -18,8 +18,6 @@ function proveedorEdit(id) {
             }else{ 
                 let proveedor = response.proveedor;
 
-                console.log(proveedor);
-
                 $('#id').val(proveedor.id).hide();
                 $('#nit_edit').val(proveedor.nit);
                 $('#nombre_edit').val(proveedor.nombre);

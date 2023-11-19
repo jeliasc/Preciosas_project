@@ -20,10 +20,6 @@ function userEdit(id) {
                 const roles = response.roles;
                 const role_user= response.role_user;
 
-                console.log(roles);
-                console.log(role_user);
-                console.log(user);
-
                 let selected = '';
                 let texto = '';
                 let role_id = '';

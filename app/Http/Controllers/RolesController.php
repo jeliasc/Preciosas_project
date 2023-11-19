@@ -162,35 +162,34 @@ class RolesController extends Controller
 
     public function destroy($id){
         if (auth::user()->can('eliminar roles')) {
-
-                DB::connection('mysql')->beginTransaction();
-            try 
-            {
+            DB::connection('mysql')->beginTransaction();
+            try {
                 $mensaje = '';
                 $error = true;
-                $user = Role::where('id', $id)->first();
+                $role = Role::where('id', $id)->first();
                 
-                if(empty($user)){
+                if(empty($role)){
                     $error = true;
                     $mensaje = 'Role no existe';
-                }else if($user->estado_id ==1){
+                }else if($role->estado_id ==1){
                     $error = false;
-                    $user->estado_id = 2;
+                    $role->estado_id = 2;
                     $mensaje ='El role ha sido deshabilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $role->save();
                 } else{
                     $error = false;
-                    $user->estado_id = 1;
+                    $role->estado_id = 1;
                     $mensaje ='El role ha sido habilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $role->save();
                 }
-                DB::connection('mysql')->commit();
-                $user->save();
-            }catch(\Throwable $th) 
-            {
+
+            }catch(\Throwable $th) {
                 $error = true;
                 $mensaje = 'Error '.$th->getMessage();  
             }
-        }else
-            {
+        }else{
                 $error = true;
                 $mensaje = 'Permiso denegado'; 
             }

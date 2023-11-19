@@ -31,25 +31,30 @@ class UsersSeeders extends Seeder
         Permission::create(['name'=>'editar usuarios'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'eliminar usuarios'])->syncRoles([$superadminRole]);
 
-        Permission::create(['name'=>'ver categorias'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'crear categorias'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'editar categorias'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'eliminar categorias'])->syncRoles([$superadminRole]);
-
-        Permission::create(['name'=>'ver clientes'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'crear clientes'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'editar clientes'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'eliminar clientes'])->syncRoles([$superadminRole]);
-
         Permission::create(['name'=>'ver articulos'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'crear articulos'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'editar articulos'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'eliminar articulos'])->syncRoles([$superadminRole]);
 
+        Permission::create(['name'=>'ver categorias'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'crear categorias'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'editar categorias'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'eliminar categorias'])->syncRoles([$superadminRole]);
+
         Permission::create(['name'=>'ver proveedores'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'crear proveedores'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'editar proveedores'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'eliminar proveedores'])->syncRoles([$superadminRole]);
+
+        Permission::create(['name'=>'ver productos'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'crear productos'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'editar productos'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'eliminar productos'])->syncRoles([$superadminRole]);
+
+        Permission::create(['name'=>'ver clientes'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'crear clientes'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'editar clientes'])->syncRoles([$superadminRole]);
+        Permission::create(['name'=>'eliminar clientes'])->syncRoles([$superadminRole]);
 
         Permission::create(['name'=>'ver compras'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'crear compras'])->syncRoles([$superadminRole]);

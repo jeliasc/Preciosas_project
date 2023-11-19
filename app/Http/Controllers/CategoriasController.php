@@ -68,7 +68,8 @@ class CategoriasController extends Controller
             try {
                 $mensaje = '';
                 $error = true;
-                $categoria = Categoria::where('id', $id)->first();     
+                $categoria = Categoria::where('id', $id)->first(); 
+
                 if(empty($categoria)){
                     $error = true;
                     $mensaje = 'Categoría no existe';
@@ -136,15 +137,16 @@ class CategoriasController extends Controller
                     $error = false;
                     $categoria->estado_id = 2;
                     $mensaje ='La categoría ha sido deshabilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $categoria->save();
                 } else{
                     $error = false;
                     $categoria->estado_id = 1;
                     $mensaje ='La categoría ha sido habilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $categoria->save();
                 }
-                DB::connection('mysql')->commit();
-                $categoria->save();
-            }catch(\Throwable $th) 
-            {
+            }catch(\Throwable $th) {
                 $error = true;
                 $mensaje = 'Error '.$th->getMessage();  
             }

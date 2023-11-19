@@ -18,11 +18,6 @@ function roleEdit(id) {
             }else{ 
                 const role = response.role;
                 const rolePermissions= response.rolePermissions;
-
-                console.log(role);
-                console.log(rolePermissions);
-
-
                 let role_id = '';
                 role_id = rolePermissions;
 

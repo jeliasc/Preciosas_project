@@ -322,6 +322,11 @@ return [
             'route'  => 'proveedoresIndex',
             'can'  => 'ver proveedores',
         ],
+        [
+            'text' => 'PRODUCTOS',
+            'route'  => 'productosIndex',
+            'can'  => 'ver productos',
+        ],
         ['header' => 'CONFIGURACIÓN DE LA CUENTA'],
         [
             'text' => 'ROLES',

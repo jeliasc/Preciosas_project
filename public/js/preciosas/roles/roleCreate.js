@@ -15,9 +15,6 @@ function roleCreate() {
 
             }else{
                 const permissions = response.permissions;
-
-                console.log(permissions);
-
                 var permisosContainer = $('#permisos_id');
                 let texto = '';
 

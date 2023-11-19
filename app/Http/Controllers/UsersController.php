@@ -21,13 +21,11 @@ class UsersController extends Controller
     }
 
     public function index(){
-
         if (Auth::user()->can('ver usuarios')) {
             try {
                 $roles = Role::all();
                 $users = User::all();
                 return view('users.index', compact('roles', 'users'));    
-
             } catch (\Throwable $th) {
                 $error = 'Eerror';
                 $error = $error.' '.$th->getMessage();
@@ -46,6 +44,7 @@ class UsersController extends Controller
                 $mensaje = '';
                 $error = true;
                 $roles = Role::all ();
+
                 if(empty($roles)){
                     $error = true;
                     $mensaje = 'Roles vacíos';
@@ -73,14 +72,12 @@ class UsersController extends Controller
                 $error = true;
                 $entrada = $request->all();
                 unset($entrada['_token']);
-
                 $role = Role::where('id', $request->role_id)->first();
 
                 if(empty($request)){
                     $error = true;
                     $mensaje = 'Error, no se pudo crear el usuario';
                 }else{
-                    
                     $entrada['password']=bcrypt($request->password);
                     $user=User::create($entrada);
                     $user->assignRole($role);
@@ -97,7 +94,6 @@ class UsersController extends Controller
             $mensaje = 'Permiso denegado';
         }
         return Response::json(array('error' => $error, 'mensaje' => $mensaje));
-
     }
 
     public function edit(Request $request, $id){
@@ -141,7 +137,6 @@ class UsersController extends Controller
                 $entrada = $request->all();
                 unset($entrada['id']);
                 unset($entrada['_token']);
-
                 $role = Role::where('id', $request->role_id)->first();
                 $user = User::findOrFail($id);
 
@@ -149,7 +144,6 @@ class UsersController extends Controller
                     $error = true;
                     $mensaje = 'Error, no se pudo actualizar el usuario';
                 }else{
-                    
                     $user->update($entrada); 
                     $user->roles()->update(['role_id'=>$role->id]);
                     $user->assignRole($role); 
@@ -172,35 +166,33 @@ class UsersController extends Controller
 
     public function destroy($id){
         if (auth::user()->can('eliminar usuarios')) {
-
-                DB::connection('mysql')->beginTransaction();
-            try 
-            {
+            DB::connection('mysql')->beginTransaction();
+            try {
                 $mensaje = '';
                 $error = true;
                 $user = User::where('id',$id)->first();
                 
                 if(empty($user)){
                     $error = true;
-                    $mensaje = 'Usuario no existe';
+                    $mensaje = 'El usuario no existe';
                 }else if($user->estado_id ==1){
                     $error = false;
                     $user->estado_id = 2;
                     $mensaje ='El usuario ha sido deshabilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $user->save();
                 } else{
                     $error = false;
                     $user->estado_id = 1;
                     $mensaje ='El usuario ha sido habilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $user->save();
                 }
-                DB::connection('mysql')->commit();
-                $user->save();
-            }catch(\Throwable $th) 
-            {
+            }catch(\Throwable $th) {
                 $error = true;
                 $mensaje = 'Error '.$th->getMessage();  
             }
-        }else
-            {
+        }else{
                 $error = true;
                 $mensaje = 'Permiso denegado'; 
             }

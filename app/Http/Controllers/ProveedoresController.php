@@ -121,7 +121,6 @@ class ProveedoresController extends Controller
 
     public function destroy($id){
         if (auth::user()->can('eliminar proveedores')) {
-
                 DB::connection('mysql')->beginTransaction();
             try 
             {
@@ -136,20 +135,20 @@ class ProveedoresController extends Controller
                     $error = false;
                     $proveedor->estado_id = 2;
                     $mensaje ='El proveedor ha sido deshabilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $proveedor->save();
                 } else{
                     $error = false;
                     $proveedor->estado_id = 1;
                     $mensaje ='El proveedor ha sido habilitado con éxito';
+                    DB::connection('mysql')->commit();
+                    $proveedor->save();
                 }
-                DB::connection('mysql')->commit();
-                $proveedor->save();
-            }catch(\Throwable $th) 
-            {
+            } catch(\Throwable $th) {
                 $error = true;
                 $mensaje = 'Error '.$th->getMessage();  
             }
-        }else
-            {
+        }else{
                 $error = true;
                 $mensaje = 'Permiso denegado'; 
             }

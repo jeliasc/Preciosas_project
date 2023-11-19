@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\ProveedoresController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsersController;
@@ -52,6 +53,13 @@ Route::post('insertarProveedor', [ProveedoresController::class, 'store'])->name(
 Route::get('/editarProveedor/{id}', [ProveedoresController::class, 'edit'])->name('editarProveedor');
 Route::post('/actualizarProveedor/{id}', [ProveedoresController::class, 'update'])->name('actualizarProveedor');
 Route::get('eliminarProveedor/{id}',[ProveedoresController::class, 'destroy'])->name('eliminarProveedor');
+
+Route::get('productosIndex', [ProductosController::class, 'index'])->name('productosIndex');
+Route::get('crearProucto', [ProductosController::class, 'create'])->name('crearProucto');
+Route::post('insertarProducto', [ProductosController::class, 'store'])->name('insertarProducto');
+Route::get('/editarProducto/{id}', [ProductosController::class, 'edit'])->name('editarProducto');
+Route::post('/actualizarProducto/{id}', [ProductosController::class, 'update'])->name('actualizarProducto');
+Route::get('eliminarProducto/{id}',[ProductosController::class, 'destroy'])->name('eliminarProducto');
 
 
 
