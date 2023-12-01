@@ -136,13 +136,13 @@ class CategoriasController extends Controller
                 }else if($categoria->estado_id ==1){
                     $error = false;
                     $categoria->estado_id = 2;
-                    $mensaje ='La categoría ha sido deshabilitado con éxito';
+                    $mensaje ='Categoría deshabilitado con éxito';
                     DB::connection('mysql')->commit();
                     $categoria->save();
                 } else{
                     $error = false;
                     $categoria->estado_id = 1;
-                    $mensaje ='La categoría ha sido habilitado con éxito';
+                    $mensaje ='Categoría habilitado con éxito';
                     DB::connection('mysql')->commit();
                     $categoria->save();
                 }

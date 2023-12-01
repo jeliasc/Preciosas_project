@@ -247,13 +247,13 @@ class ProductosController extends Controller{
                 }else if($producto->estado_id ==1){
                     $error = false;
                     $producto->estado_id = 2;
-                    $mensaje ='El producto ha sido deshabilitado con éxito';
+                    $mensaje ='Producto deshabilitado con éxito';
                     DB::connection('mysql')->commit();
                     $producto->save();
                 } else{
                     $error = false;
                     $producto->estado_id = 1;
-                    $mensaje ='El producto ha sido habilitado con éxito';
+                    $mensaje ='Producto habilitado con éxito';
                     DB::connection('mysql')->commit();
                     $producto->save();
                 }

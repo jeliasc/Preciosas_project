@@ -2,40 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProveedoresRequest;
-use App\Models\Proveedor;
+use App\Http\Requests\ClientesRequest;
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 
-class ProveedoresController extends Controller
+class ClientesController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
     }
-       
+
     public function index(){
-        if(Auth::user()->can('ver proveedores')){
+        if (Auth::user()->can('ver productos')) {
             try {
-                $proveedores = Proveedor::all();
-                return view('proveedores.index', compact('proveedores'));
+                $clientes = Cliente::all();
+                return view('clientes.index', compact('clientes'));
             } catch (\Throwable $th) {
                 $error = 'Error';
-                $error = $error.' '. $th->getMessage();
+                $error = $error. '' . $th->getMessage();
                 Session::flash('eAuth', $error);
                 return redirect('home');
-            }  
-        }else {
-            Session::flash('eAuth', 'Error, permiso denegado');
+            }
+        }else{
+            Session::flash('eAuth', 'Error, Permiso denegado.');
             return redirect('home');
         }
     }
 
-    public function store(ProveedoresRequest $request){
-        if(Auth::user()->can('crear proveedores',)){
+    public function store(ClientesRequest $request){
+        if(Auth::user()->can('crear clientes',)){
             DB::connection('mysql')->beginTransaction();
             try {
                 $mensaje = '';
@@ -45,12 +45,12 @@ class ProveedoresController extends Controller
 
                 if(empty($request)){
                     $error = true;
-                    $mensaje = 'Error, no se pudo crear el proveedor';
+                    $mensaje = 'Error, no se pudo crear el cliente';
                 }else{
-                    Proveedor::create($entrada);
+                    Cliente::create($entrada);
                     DB::connection('mysql')->commit();
                     $error = false;
-                    $mensaje ='Proveedor creado con éxito';
+                    $mensaje ='Cliente creado con éxito';
                 }
             } catch (\Throwable $th) {
                 $error = true;
@@ -64,14 +64,14 @@ class ProveedoresController extends Controller
     }
 
     public function edit(Request $request, $id){
-        if(Auth::user()->can('editar proveedores')){
+        if(Auth::user()->can('editar clientes')){
             try {
                 $mensaje = '';
                 $error = true;
-                $proveedor = Proveedor::where('id', $id)->first();     
-                if(empty($proveedor)){
+                $cliente = Cliente::where('id', $id)->first();     
+                if(empty($cliente)){
                     $error = true;
-                    $mensaje = 'Proveedor no existe';
+                    $mensaje = 'Cliente no existe';
                 }else{
                     $error = false;
                     $mensaje ='Consulta exitosa';
@@ -85,14 +85,14 @@ class ProveedoresController extends Controller
             $error = true;
             $mensaje = 'Permiso denegado';
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'proveedor' => $proveedor));
+        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'cliente' => $cliente));
     }
 
-    public function update(ProveedoresRequest $request, $id){
-        if(Auth::user()->can('editar proveedores',)){
+    public function update(ClientesRequest $request, $id){
+        if(Auth::user()->can('editar clientes',)){
             DB::connection('mysql')->beginTransaction();
             try {
-                $proveedor=Proveedor::find($id);
+                $cliente=Cliente::find($id);
                 $mensaje = '';
                 $error = true;
                 $entrada = $request->all();
@@ -101,12 +101,12 @@ class ProveedoresController extends Controller
 
                 if(empty($request)){
                     $error = true;
-                    $mensaje = 'Error, no se pudo editar el proveedor';
+                    $mensaje = 'Error, no se pudo editar el cliente';
                 }else{
-                    $proveedor->update($entrada);                  
+                    $cliente->update($entrada);                  
                     DB::connection('mysql')->commit();
                     $error = false;
-                    $mensaje ='Proveedor actualizado con éxito';
+                    $mensaje ='Cliente actualizado con éxito';
                 }
             } catch (\Throwable $th) {
                 $error = true;
@@ -120,29 +120,29 @@ class ProveedoresController extends Controller
     }
 
     public function destroy($id){
-        if (auth::user()->can('eliminar proveedores')) {
+        if (auth::user()->can('eliminar clientes')) {
                 DB::connection('mysql')->beginTransaction();
             try 
             {
                 $mensaje = '';
                 $error = true;
-                $proveedor = Proveedor::where('id', $id)->first();
+                $cliente = Cliente::where('id', $id)->first();
                 
-                if(empty($proveedor)){
+                if(empty($cliente)){
                     $error = true;
-                    $mensaje = 'Proveedor no existe';
-                }else if($proveedor->estado_id ==1){
+                    $mensaje = 'Cliente no existe';
+                }else if($cliente->estado_id ==1){
                     $error = false;
-                    $proveedor->estado_id = 2;
-                    $mensaje ='Proveedor deshabilitado con éxito';
+                    $cliente->estado_id = 2;
+                    $mensaje ='Cliente deshabilitado con éxito';
                     DB::connection('mysql')->commit();
-                    $proveedor->save();
+                    $cliente->save();
                 } else{
                     $error = false;
-                    $proveedor->estado_id = 1;
-                    $mensaje ='Proveedor habilitado con éxito';
+                    $cliente->estado_id = 1;
+                    $mensaje ='Cliente habilitado con éxito';
                     DB::connection('mysql')->commit();
-                    $proveedor->save();
+                    $cliente->save();
                 }
             } catch(\Throwable $th) {
                 $error = true;

@@ -174,13 +174,13 @@ class RolesController extends Controller
                 }else if($role->estado_id ==1){
                     $error = false;
                     $role->estado_id = 2;
-                    $mensaje ='El role ha sido deshabilitado con éxito';
+                    $mensaje ='Role deshabilitado con éxito';
                     DB::connection('mysql')->commit();
                     $role->save();
                 } else{
                     $error = false;
                     $role->estado_id = 1;
-                    $mensaje ='El role ha sido habilitado con éxito';
+                    $mensaje ='Role habilitado con éxito';
                     DB::connection('mysql')->commit();
                     $role->save();
                 }

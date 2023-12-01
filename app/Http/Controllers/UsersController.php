@@ -178,13 +178,13 @@ class UsersController extends Controller
                 }else if($user->estado_id ==1){
                     $error = false;
                     $user->estado_id = 2;
-                    $mensaje ='El usuario ha sido deshabilitado con éxito';
+                    $mensaje ='Usuario deshabilitado con éxito';
                     DB::connection('mysql')->commit();
                     $user->save();
                 } else{
                     $error = false;
                     $user->estado_id = 1;
-                    $mensaje ='El usuario ha sido habilitado con éxito';
+                    $mensaje ='Usuario habilitado con éxito';
                     DB::connection('mysql')->commit();
                     $user->save();
                 }

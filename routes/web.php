@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoriasController;
+use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\ProveedoresController;
@@ -60,6 +61,13 @@ Route::post('insertarProducto', [ProductosController::class, 'store'])->name('in
 Route::get('/editarProducto/{id}', [ProductosController::class, 'edit'])->name('editarProducto');
 Route::post('/actualizarProducto/{id}', [ProductosController::class, 'update'])->name('actualizarProducto');
 Route::get('eliminarProducto/{id}',[ProductosController::class, 'destroy'])->name('eliminarProducto');
+
+Route::get('clientesIndex', [ClientesController::class, 'index'])->name('clientesIndex');
+Route::get('crearCliente', [ClientesController::class, 'create'])->name('crearCliente');
+Route::post('insertarCliente', [ClientesController::class, 'store'])->name('insertarCliente');
+Route::get('/editarCliente/{id}', [ClientesController::class, 'edit'])->name('editarCliente');
+Route::post('/actualizarCliente/{id}', [ClientesController::class, 'update'])->name('actualizarCliente');
+Route::get('eliminarCliente/{id}',[ClientesController::class, 'destroy'])->name('eliminarCliente');
 
 
 

@@ -50,10 +50,15 @@ class User extends Authenticatable
     }
 
     public function adminlte_image(){
-        return "/images/usuario.png";
+        return "/images/user4.jpg";
     }
     
     public function adminlte_desc(){
-        return "Usuario";
+        return "User";
+    }
+
+    public function adminlte_profile_url()
+    {
+        return 'profile/username';
     }
 }

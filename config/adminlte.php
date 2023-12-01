@@ -130,10 +130,10 @@ return [
     */
 
     'usermenu_enabled' => true,
-    'usermenu_header' => false,
+    'usermenu_header' => true,
     'usermenu_header_class' => 'bg-primary',
-    'usermenu_image' => false,
-    'usermenu_desc' => false,
+    'usermenu_image' => true,
+    'usermenu_desc' => true,
     'usermenu_profile_url' => false,
 
     /*
@@ -167,10 +167,10 @@ return [
     |
     */
 
-    'classes_auth_card' => 'card-outline card-primary',
+    'classes_auth_card' => 'card-outline card-danger',
     'classes_auth_header' => '',
     'classes_auth_body' => '',
-    'classes_auth_footer' => '',
+    'classes_auth_footer' => 'd-none',
     'classes_auth_icon' => '',
     'classes_auth_btn' => 'btn-flat btn-primary',
 
@@ -192,9 +192,9 @@ return [
     'classes_content_wrapper' => '',
     'classes_content_header' => '',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4',
+    'classes_sidebar' => 'sidebar-dark-danger elevation-4',
     'classes_sidebar_nav' => '',
-    'classes_topnav' => 'navbar-white navbar-light',
+    'classes_topnav' => 'navbar-light navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
     'classes_topnav_container' => 'container',
 
@@ -308,49 +308,61 @@ return [
         ],
         [
             'text' => 'INICIO',
-            'route'  => 'home',
+            'route' => 'home',
             'icon' => 'fas fa-fw fa-home',
-            'can'  => 'ver home',
+            'icon_color' => 'primary',
+            'can' => 'ver home',
         ],
         [
             'text' => 'CATEGORÍAS',
-            'route'  => 'categoriasIndex',
-            'can'  => 'ver categorias',
+            'route' => 'categoriasIndex',
+            'icon_color' => 'primary',
+            'can' => 'ver categorias',
         ],
         [
             'text' => 'PROVEEDORES',
             'route'  => 'proveedoresIndex',
+            'icon_color' => 'primary',
             'can'  => 'ver proveedores',
         ],
         [
             'text' => 'PRODUCTOS',
             'route'  => 'productosIndex',
+            'icon_color' => 'primary',
             'can'  => 'ver productos',
+        ],
+        [
+            'text' => 'CLIENTES',
+            'route'  => 'clientesIndex',
+            'icon_color' => 'primary',
+            'can'  => 'ver clientes',
         ],
         ['header' => 'CONFIGURACIÓN DE LA CUENTA'],
         [
             'text' => 'ROLES',
             'route'  => 'rolesIndex',
             'icon' => 'fa-solid fa-user-gear',
+            'icon_color' => 'primary',
             'can'  => 'ver roles',
         ], 
         [
             'text' => 'USUARIOS',
             'route'  => 'usuariosIndex',
             'icon' => 'fas fa fa-users',
+            'icon_color' => 'primary',
             'can'  => 'ver usuarios',
         ], 
         [
             'text' => 'profile',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-user',
-            'can'  => 'ver home',
+            'can'  => 'home',
         ],
         [
             'text' => 'change_password',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-lock',
-            'can'  => 'ver home',
+            'can'  => 'home',
         ],
         [
             'text'    => 'multilevel',
