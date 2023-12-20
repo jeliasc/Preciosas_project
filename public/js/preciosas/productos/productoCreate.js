@@ -2,7 +2,7 @@ function productoCreate() {
     $.ajax({
         type: "get",
         dataType: "json",
-        url: "crearProucto",
+        url: "crearArticulo",
 
         success: function (response) {
             if(response.error){
@@ -58,7 +58,7 @@ function productoInsert() {
         type: "post",
         dataType: "json",
         headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "insertarProducto",
+        url: "insertarArticulo",
         data: form,
         contentType: false,
         processData: false,   

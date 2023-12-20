@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ClientesController;
+use App\Http\Controllers\ComprasController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\ProveedoresController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\VentasController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +29,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('home', [HomeController::class, 'index'])->name('home');
 
 Route::get('usuariosIndex', [UsersController::class, 'index'])->name('usuariosIndex');
 Route::get('crearUsuario', [UsersController::class, 'create'])->name('crearUsuario');
@@ -39,35 +41,59 @@ Route::get('eliminarUsuario/{id}',[UsersController::class, 'destroy'])->name('el
 Route::get('rolesIndex', [RolesController::class, 'index'])->name('rolesIndex');
 Route::get('crearRole', [RolesController::class, 'create'])->name('crearRole');
 Route::post('insertarRole', [RolesController::class, 'store'])->name('insertarRole');
-Route::get('/editarRole/{id}', [RolesController::class, 'edit'])->name('editarRole');
-Route::post('/actualizarRole/{id}', [RolesController::class, 'update'])->name('actualizarRole');
+Route::get('editarRole/{id}', [RolesController::class, 'edit'])->name('editarRole');
+Route::post('actualizarRole/{id}', [RolesController::class, 'update'])->name('actualizarRole');
 Route::get('eliminarRole/{id}',[RolesController::class, 'destroy'])->name('eliminarRole');
 
 Route::get('categoriasIndex', [CategoriasController::class, 'index'])->name('categoriasIndex');
 Route::post('insertarCategoria', [CategoriasController::class, 'store'])->name('insertarCategoria');
-Route::get('/editarCategoria/{id}', [CategoriasController::class, 'edit'])->name('editarCategoria');
-Route::post('/actualizarCategoria/{id}', [CategoriasController::class, 'update'])->name('actualizarCategoria');
+Route::get('editarCategoria/{id}', [CategoriasController::class, 'edit'])->name('editarCategoria');
+Route::post('actualizarCategoria/{id}', [CategoriasController::class, 'update'])->name('actualizarCategoria');
 Route::get('eliminarCategoria/{id}',[CategoriasController::class, 'destroy'])->name('eliminarCategoria');
 
 Route::get('proveedoresIndex', [ProveedoresController::class, 'index'])->name('proveedoresIndex');
 Route::post('insertarProveedor', [ProveedoresController::class, 'store'])->name('insertarProveedor');
-Route::get('/editarProveedor/{id}', [ProveedoresController::class, 'edit'])->name('editarProveedor');
-Route::post('/actualizarProveedor/{id}', [ProveedoresController::class, 'update'])->name('actualizarProveedor');
+Route::get('editarProveedor/{id}', [ProveedoresController::class, 'edit'])->name('editarProveedor');
+Route::post('actualizarProveedor/{id}', [ProveedoresController::class, 'update'])->name('actualizarProveedor');
 Route::get('eliminarProveedor/{id}',[ProveedoresController::class, 'destroy'])->name('eliminarProveedor');
 
-Route::get('productosIndex', [ProductosController::class, 'index'])->name('productosIndex');
-Route::get('crearProucto', [ProductosController::class, 'create'])->name('crearProucto');
-Route::post('insertarProducto', [ProductosController::class, 'store'])->name('insertarProducto');
-Route::get('/editarProducto/{id}', [ProductosController::class, 'edit'])->name('editarProducto');
-Route::post('/actualizarProducto/{id}', [ProductosController::class, 'update'])->name('actualizarProducto');
-Route::get('eliminarProducto/{id}',[ProductosController::class, 'destroy'])->name('eliminarProducto');
+Route::get('articulosIndex', [ProductosController::class, 'index'])->name('articulosIndex');
+Route::get('crearArticulo', [ProductosController::class, 'create'])->name('crearArticulo');
+Route::post('insertarArticulo', [ProductosController::class, 'store'])->name('insertarArticulo');
+Route::get('editarArticulo/{id}', [ProductosController::class, 'edit'])->name('editarArticulo');
+Route::post('actualizarArticulo/{id}', [ProductosController::class, 'update'])->name('actualizarArticulo');
+Route::get('eliminarArticulo/{id}',[ProductosController::class, 'destroy'])->name('eliminarArticulo');
 
 Route::get('clientesIndex', [ClientesController::class, 'index'])->name('clientesIndex');
 Route::get('crearCliente', [ClientesController::class, 'create'])->name('crearCliente');
 Route::post('insertarCliente', [ClientesController::class, 'store'])->name('insertarCliente');
-Route::get('/editarCliente/{id}', [ClientesController::class, 'edit'])->name('editarCliente');
-Route::post('/actualizarCliente/{id}', [ClientesController::class, 'update'])->name('actualizarCliente');
+Route::get('editarCliente/{id}', [ClientesController::class, 'edit'])->name('editarCliente');
+Route::post('actualizarCliente/{id}', [ClientesController::class, 'update'])->name('actualizarCliente');
 Route::get('eliminarCliente/{id}',[ClientesController::class, 'destroy'])->name('eliminarCliente');
+
+Route::get('comprasIndex', [ComprasController::class, 'index'])->name('comprasIndex');
+Route::get('comprasAnuladas',[ComprasController::class, 'comprasAnuladas'])->name('comprasAnuladas');
+Route::get('crearCompra', [ComprasController::class, 'create'])->name('crearCompra');
+Route::post('insertarCompra', [ComprasController::class, 'store'])->name('insertarCompra');
+Route::get('eliminarCompra/{id}',[ComprasController::class, 'destroy'])->name('eliminarCompra');
+Route::get('detalleCompra/{id}',[ComprasController::class, 'detalleCompra'])->name('detalleCompra');
+Route::get('compra/pdf/{id}',[ComprasController::class, 'pdf'])->name('compra.pdf');
+
+Route::get('ventasIndex',[VentasController::class, 'index'])->name('ventasIndex');
+Route::get('ventasAnuladas',[VentasController::class, 'ventasAnuladas'])->name('ventasAnuladas');
+Route::get('crearVenta', [VentasController::class, 'create'])->name('crearVenta');
+Route::post('insertarVenta', [VentasController::class, 'store'])->name('insertarVenta');
+Route::get('detalleVenta/{id}',[VentasController::class, 'detalleVenta'])->name('detalleVenta');
+Route::get('eliminarVenta/{id}',[VentasController::class, 'destroy'])->name('eliminarVenta');
+Route::get('venta/reportDay',[VentasController::class, 'reportDay'])->name('venta.reportDay');
+Route::get('venta/reportDate',[VentasController::class, 'reportDate'])->name('venta.reportDate');
+Route::post('venta/reportResult',[VentasController::class, 'reportResult'])->name('venta.reportResult');
+Route::get('venta/pdf/{id}',[VentasController::class, 'pdf'])->name('venta.pdf');
+Route::get('venta/print/{id}',[VentasController::class, 'print'])->name('venta.print');
+
+
+
+
 
 
 

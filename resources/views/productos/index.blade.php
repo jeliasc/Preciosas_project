@@ -3,7 +3,7 @@
 @section('title', 'Index_Productos')
 
 @section('content_header')
-    <h1>Productos</h1>
+    <h1>Artículos</h1>
 @stop
 
 @section('content')
@@ -21,6 +21,7 @@
                 <th scope="col">Imagen</th>
                 <th scope="col">Código</th>
                 <th scope="col">Nombre</th>
+                <th scope="col">Stock</th>
                 <th scope="col">Precio/Venta</th>
                 <th scope="col">Descripción</th>
                 <th scope="col">Categoría</th>
@@ -43,6 +44,7 @@
                             @endif
                         <td>{{$producto->code}}</td>
                         <td>{{$producto->nombre}}</td>
+                        <td>{{$producto->stock}}</td>
                         <td>{{$producto->precio}}</td>
                         <td>{{$producto->descripcion}}</td>
                         <td>{{$producto->categoria->nombre}}</td>
@@ -88,6 +90,6 @@
 @section('js')
     <script src="{{ asset('js/dataTable/dataTable.js') }}"></script>
     <script src="{{ asset('js/preciosas/productos/productoCreate.js') }}"></script>
-        <script src="{{ asset('js/preciosas/productos/productoUpdate.js') }}"></script>
-        <script src="{{ asset('js/preciosas/productos/productoDelete.js') }}"></script>
+    <script src="{{ asset('js/preciosas/productos/productoUpdate.js') }}"></script>
+    <script src="{{ asset('js/preciosas/productos/productoDelete.js') }}"></script>
 @stop

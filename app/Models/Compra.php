@@ -5,35 +5,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Producto extends Model
+class Compra extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'code',
-        'nombre',
-        'stock',
-        'precio',
-        'descripcion',
-        'categoria_id',
+    protected $fillable=[
+        'user_id',
         'proveedor_id',
-        'foto_id',
+        'fecha',
+        'tax',
+        'total',
         'estado_id',
     ];
-
     public function estado(){
         return $this->belongsTo(Estado::class);
     }
-
-    public function foto(){
-        return $this->belongsTo(Foto::class);
-    }
-
-    public function categoria(){
-        return $this->belongsTo(Categoria::class);
+    
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 
     public function proveedor(){
         return $this->belongsTo(Proveedor::class);
     }
-}
 
+    public function detalleCompras(){
+        return $this->hasMany(DetalleCompra::class);
+    }
+}

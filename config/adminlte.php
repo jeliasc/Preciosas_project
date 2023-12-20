@@ -64,7 +64,7 @@ return [
     */
 
     'logo' => '<b>Preciosas</b>',
-    'logo_img' => 'vendor/adminlte/dist/img/preciosas6.jpg',
+    'logo_img' => 'vendor/adminlte/dist/img/preciosas001.jpeg',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -326,8 +326,8 @@ return [
             'can'  => 'ver proveedores',
         ],
         [
-            'text' => 'PRODUCTOS',
-            'route'  => 'productosIndex',
+            'text' => 'ARTÍCULOS',
+            'route'  => 'articulosIndex',
             'icon_color' => 'primary',
             'can'  => 'ver productos',
         ],
@@ -336,6 +336,72 @@ return [
             'route'  => 'clientesIndex',
             'icon_color' => 'primary',
             'can'  => 'ver clientes',
+        ],
+        [
+            'text'    => 'COMPRAS', 
+            'icon_color' => 'primary',
+            'can'  => 'ver compras',
+            'submenu' => [
+                [
+                    'text' => 'Ver Compras',
+                    'route'  => 'comprasIndex',
+                    'icon'    => 'fa fa-duotone fa-check-double',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver compras',
+  
+                ],
+                [
+                    'text' => 'Compras Anuladas',
+                    'route'  => 'comprasAnuladas',
+                    'icon'    => 'fa-sharp fa-solid fa-ban',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver compras',
+                ],
+            ],
+        ],
+        [
+            'text'    => 'VENTAS',  
+            'icon_color' => 'primary',
+            'can'  => 'crear ventas',
+            'submenu' => [
+                [
+                    'text' => 'Crear Ventas',
+                    'route'  => 'crearVenta',
+                    'icon'    => 'fa fa-solid fa-plus',
+                    'icon_color' => 'primary',
+                    'can'  => 'crear ventas',
+  
+                ],
+                [
+                    'text' => 'Ventas Facturadas',
+                    'route'  => 'ventasIndex',
+                    'icon'    => 'fa fa-duotone fa-check-double',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver reporte de ventas',
+  
+                ],
+                [
+                    'text' => 'Ventas Anuladas',
+                    'route'  => 'ventasAnuladas',
+                    'icon'    => 'fa-sharp fa-solid fa-ban',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver reporte de ventas',
+                ],
+                [
+                    'text' => 'Reporte por Día',
+                    'route'  => 'venta.reportDay',
+                    'icon'    => 'fa fa-sharp fa-solid fa-file-lines',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver reporte de ventas',
+                ],
+                [
+                    'text' => 'Reporte por Fecha',
+                    'route'  => 'venta.reportDate',
+                    'icon'    => 'fa fa-sharp fa-solid fa-file-lines',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver reporte de ventas',
+                ],
+            ],
         ],
         ['header' => 'CONFIGURACIÓN DE LA CUENTA'],
         [
@@ -512,11 +578,7 @@ return [
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js',
                 ],
-                [
-                    'type' => 'css',
-                    'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css',
-                ],
+               
             ],
         ],
         'Chartjs' => [

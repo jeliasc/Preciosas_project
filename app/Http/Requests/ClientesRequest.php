@@ -24,9 +24,6 @@ class ClientesRequest extends FormRequest
         return [
             'nit'=>'required',
             'nombre'=>'required',
-            'direccion'=>'required',
-            'telefono'=>'required',
-            'email'=>'required|email',
         ];
     }
 
@@ -35,10 +32,6 @@ class ClientesRequest extends FormRequest
         return[
             'nit.required'=>'El campo nit es requerido',
             'nombre.required'=>'El campo nombre es requerido',
-            'direccion.required'=>'El campo dirección es requerido',
-            'telefono.required'=>'El campo teléfono es requerido',
-            'email.required'=>'El campo e-mail es requerido',
-            'email.email'=>'Campo de tipo e-mail',
         ];
     }
 }

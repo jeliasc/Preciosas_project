@@ -1,8 +1,8 @@
-function productoDelete(id) {
+function compraDelete(id) {
     $.ajax({
         type: "get",
         dataType: "json",
-        url: "eliminarArticulo/"+id,
+        url: "eliminarCompra/"+id,
         data: {id},
 
         success: function (response) {
@@ -33,7 +33,6 @@ function productoDelete(id) {
         },error: function (jqXHR, estado, error){
             console.log(estado);
             console.log(error);
-
         }
     })   
 }

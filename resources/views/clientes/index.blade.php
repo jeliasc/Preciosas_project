@@ -7,6 +7,7 @@
 @stop
 
 @section('content')
+
 @can('crear clientes')
     <p><a class="btn btn-outline-success" type="button" onclick="return clienteCreate()">Nuevo</a></p>
 @endcan

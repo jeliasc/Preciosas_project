@@ -4,7 +4,7 @@
     <div class="modal-dialog">
         <div class="modal-content my-sm-0">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Crear Producto</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Crear Artículos</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -34,7 +34,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label>Precio</label></td>
+                                    <td><label>Precio/V</label></td>
                                     <td><input class="form-control" type="text" id="precio" name="precio">
                                         @error('precio')
                                             <small> 
@@ -57,7 +57,7 @@
                                     <td><label>Categoría</label></td>
                                     <td>
                                         <select name="categoria_id" id="categoria_id" class="form-select">
-                                            <option value=""></option>
+                                                <option value=""></option>
                                         </select> 
                                     </td>
                                 </tr>
@@ -90,4 +90,4 @@
         </div>
     </div>
 
-<!-- Fin de modal crear proveedor -->   
+<!-- Fin de modal crear proveedor -->  

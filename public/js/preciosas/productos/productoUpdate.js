@@ -3,7 +3,7 @@ function productoEdit(id) {
         type: "get",
         dataType: "json",
         headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "editarProducto/"+id,
+        url: "editarArticulo/"+id,
         data: {id},
 
         success: function (response) {
@@ -26,11 +26,6 @@ function productoEdit(id) {
                 let imagen = '';
                 let texto = '';
 
-                console.log(producto);
-                console.log(categorias);
-                console.log(proveedores);
-                console.log(foto);
-
                 $("#categoria_id_edit" ).empty();
                 textoCat += '<option value="">Elija una opcion</option>';            
                 $("#proveedor_id_edit" ).empty();
@@ -52,7 +47,6 @@ function productoEdit(id) {
                         if(proveedor.id == producto.proveedor_id){
                                 selected = 'selected';
                                 textoProv += '<option '+selected+' value="'+proveedor.id+'">'+proveedor.nombre+'</option>';
-
                         }else{
                             textoProv += '<option value="'+proveedor.id+'">'+proveedor.nombre+'</option>';
                         }
@@ -96,7 +90,7 @@ function productoUpdate() {
         type: "post",
         dataType: "json",
         headers: {'X-CSRF-TOKEN': $('#_token').val()},
-        url: "actualizarProducto/"+id,
+        url: "actualizarArticulo/"+id,
         data: form,  
         contentType: false,
         processData: false,  
