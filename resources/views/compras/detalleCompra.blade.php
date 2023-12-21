@@ -31,11 +31,21 @@
     <div class="table-responsive col-md-12 text-center">
         <table id="detalles" class="table">
             <thead>
+                <th>Cantidad</th>
                 <th>Artículo</th>
                 <th>Precio (Q)</th>
-                <th>Cantidad</th>
                 <th>SubTotal (Q)</th>
             </thead>
+            <tbody>
+                @foreach($detalleCompras as $detalleCompra)
+                    <tr>
+                        <td>{{$detalleCompra->cantidad}}</td>
+                        <td>{{$detalleCompra->producto->nombre}}</td>
+                        <td>Q. {{$detalleCompra->precio}}</td>
+                        <td>Q. {{number_format(($detalleCompra->cantidad*$detalleCompra->precio),2)}}</td>
+                    </tr>
+                @endforeach
+            </tbody>
             <tfoot>
                 <tr>
                     <th colspan="3">
@@ -47,23 +57,13 @@
                 </tr>
                 <tr>
                     <th colspan="3">
-                        <p align="right">TOTAL</p>
+                        <p align="right">TOTAL A PAGAR</p>
                     </th>
                     <th>
                         <p align="center">Q. {{number_format($compra->total,2)}}</p>
                     </th>
                 </tr>
             </tfoot>
-            <tbody>
-                @foreach($detalleCompras as $detalleCompra)
-                    <tr>
-                        <td>{{$detalleCompra->producto->nombre}}</td>
-                        <td>Q. {{$detalleCompra->precio}}</td>
-                        <td>{{$detalleCompra->cantidad}}</td>
-                        <td>Q. {{$detalleCompra->cantidad*$detalleCompra->precio,}}</td>
-                    </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>    
 </div>
@@ -77,8 +77,8 @@
             @endif
         </td> 
         <td>
-            @if($venta->estado_id ==3)
-                <a class="btn btn-primary btn-block" href="{{ route('indexCompras') }}" role="button">Regresar</a>
+            @if($compra->estado_id ==3)
+                <a class="btn btn-primary btn-block" href="{{ route('comprasIndex') }}" role="button">Regresar</a>
             @else
                 <a class="btn btn-primary btn-block" href="{{ route('comprasAnuladas') }}" role="button">Regresar</a>
             @endif

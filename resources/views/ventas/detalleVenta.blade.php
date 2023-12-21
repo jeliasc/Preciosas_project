@@ -3,6 +3,10 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
+<div>
+    <label class="form-control-label" for="fecha_compra">Fecha de venta</label>
+    <p>{{date("d/m/y H:i:s", strtotime($venta->fecha))}}</p>
+</div>
 @stop
 
 @section('content')
@@ -32,10 +36,6 @@
                 <th>SubTotal(Q)</th>
             </thead>
             <tbody>
-                @php
-                    $subTotal=0;
-                    $total=0;
-                @endphp
                 @foreach($detalleVentas as $detalleVenta)
                     <tr>
                         <td>{{$detalleVenta->cantidad}}</td>
@@ -44,30 +44,17 @@
                         <td>Q. {{$detalleVenta->precio}}</td>
                         <td>Q. {{$detalleVenta->extra}}</td>
                         <td>Q. {{$detalleVenta->descuento}}</td>
-                        @php
-                            $subTotal=number_format(((($detalleVenta->cantidad*$detalleVenta->precio)+$detalleVenta->extra)-$detalleVenta->descuento),2);
-                            $total=$total+$subTotal;
-                        @endphp
-                        <td align="center">Q. {{$subTotal}}
-                        </td>
+                        <td>Q. {{number_format(((($detalleVenta->cantidad*$detalleVenta->precio)+$detalleVenta->extra)-$detalleVenta->descuento),2)}}</td>
                     </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr>
                     <th colspan="6">
-                        <p align="right">SUBTOTAL VENTA</p>
+                        <p align="right">TOTAL IMPUESTO (12%)</p>
                     </th>
                     <th>
-                        <p align="center">Q. {{number_format(($subTotalVenta),2)}}</p>
-                    </th>
-                </tr>
-                <tr>
-                    <th colspan="6">
-                        <p align="right">+ ENVÍO</p>
-                    </th>
-                    <th>
-                        <p align="center">Q. {{number_format(($venta->envio),2)}}</p>
+                        <p align="center">Q. {{number_format(($venta->tax),2)}}</p>
                     </th>
                 </tr>
                 <tr>
@@ -75,7 +62,7 @@
                         <p align="right">TOTAL A PAGAR</p>
                     </th>
                     <th>
-                        <p align="center">Q. {{number_format(($total=$total+$venta->envio),2)}}</p>
+                        <p align="center">Q. {{number_format(($venta->total),2)}}</p>
                     </th>
                 </tr>
             </tfoot>

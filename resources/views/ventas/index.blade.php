@@ -7,6 +7,11 @@
 @stop
 
 @section('content')
+    @if(Session::has('error'))
+        <p class="bg-danger">
+            {{session('error')}}
+        </p>
+    @endif
     @if(Session::has('print'))
         <p class="bg-primary">
             {{session('print')}}
@@ -29,10 +34,10 @@
             @if($ventas)
                 @foreach($ventas as $venta)
                     <tr>
-                        <td><a href="{{ route('detalleVenta', ['id'=>$venta->id]) }}">{{$venta->numero_factura}}</a></td>
+                        <td>{{$venta->numero_factura}}</td>
                         <td>{{$venta->user->name}}</td>
                         <td>{{$venta->cliente->nombre}}</td>
-                        <td>{{$venta->fecha}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($venta->fecha))}}</td>
                         <td>{{$venta->total}}</td>
                         <td>{{$venta->estado->nombre}}</td>
                         <td>

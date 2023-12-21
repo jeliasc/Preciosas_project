@@ -158,12 +158,8 @@ class ComprasController extends Controller
         $compra = Compra::findOrFail($id);
         if (Auth::user()->can('ver compras')) {
             try {
-                $subtotal=0;
                 $detalleCompras=$compra->detalleCompras;
-                foreach($detalleCompras as $detalleCompra){
-                    $subtotal += $detalleCompra->cantidad * $detalleCompra->precio;
-                }
-                return view('compras.detalleCompra', compact('compra','detalleCompras', 'subtotal'));
+                return view('compras.detalleCompra', compact('compra','detalleCompras'));
             } catch (\Throwable $th) {
                 $error="Error";
                 $error=$error. ''. $th->getMessage();

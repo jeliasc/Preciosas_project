@@ -14,7 +14,7 @@
 {{-- formulario de index compras--}}  
 
 {!! Form::open(['url' => '']) !!}
-    <table id="myTable" class="table table-striped dt-responsive nowrap" style="width:100%">
+    <table id="myTable" class="table table-striped dt-responsive nowrap text-center" style="width:100%">
         <thead>
             <tr>
                 <th scope="col">Id</th>
@@ -24,8 +24,6 @@
                 <th scope="col">Impuesto</th>
                 <th scope="col">Total</th>
                 <th scope="col">Estado</th>
-                <th scope="col">Creado</th>
-                <th scope="col">Actualizado</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
@@ -36,12 +34,10 @@
                         <td>{{$compra->id}}</td>
                         <td>{{$compra->user->name}}</td>
                         <td>{{$compra->proveedor->nombre}}</td>
-                        <td>{{$compra->fecha}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($compra->fecha))}}</td>
                         <td>{{$compra->tax}}</td>
                         <td>{{$compra->total}}</td>
                         <td>{{$compra->estado->nombre}}</td>
-                        <td>{{$compra->created_at}}</td>
-                        <td>{{$compra->updated_at}}</td>
                         <td>
                             <div class="row">
                                 <div class="col-md-3">

@@ -24,8 +24,6 @@
                 <th scope="col">Impuesto</th>
                 <th scope="col">Total</th>
                 <th scope="col">Estado</th>
-                <th scope="col">Creado</th>
-                <th scope="col">Actualizado</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
@@ -36,29 +34,20 @@
                         <td>{{$compra->id}}</td>
                         <td>{{$compra->user->name}}</td>
                         <td>{{$compra->proveedor->nombre}}</td>
-                        <td>{{$compra->fecha}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($compra->fecha))}}</td>
                         <td>{{$compra->tax}}</td>
                         <td>{{$compra->total}}</td>
                         <td>{{$compra->estado->nombre}}</td>
-                        <td>{{$compra->created_at}}</td>
-                        <td>{{$compra->updated_at}}</td>
                         <td>
                             <div class="row">
-                                <div class="col-md-3">
+                                <div class="col-md-6">
                                     @can('ver compras')
                                         <a href="{{ route('detalleCompra', ['id'=>$compra->id]) }}"><i class="fa fa-regular fa-eye" title="Detalles de compra" aria-hidden="true"></i></a>
                                     @endcan
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6">
                                     @can('ver compras')
                                         <a href="{{ route('compra.pdf', ['id'=>$compra->id]) }}"><i class="fa fa-regular fa-file-pdf" title="Exportar a PDF" aria-hidden="true"></i></a>
-                                    @endcan
-                                </div>
-                                <div class="col-md-3">
-                                    @can('eliminar compras')
-                                        @if($compra->estado_id == 3)
-                                            <a class="btn-modal-editar" type="button" onclick="return compraDelete({{$compra->id}})"><i class="fa-solid fa-ban" aria-hidden="true" title="Anular compra"></i></a>
-                                        @endif
                                     @endcan
                                 </div>
                             </div>

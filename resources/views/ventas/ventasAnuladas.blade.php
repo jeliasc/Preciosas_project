@@ -7,36 +7,17 @@
 @stop
 
 @section('content')
+    @if(Session::has('error'))
+        <p class="bg-danger">
+            {{session('error')}}
+        </p>
+    @endif
     @if(Session::has('print'))
         <p class="bg-primary">
             {{session('print')}}
         </p>
     @endif
-    @if(Session::has('eAut'))
-        <p class="bg-warning">
-            {{session('eAut')}}
-        </p>
-    @endif
-    @if(Session::has('ventaCreada'))
-        <p class="bg-primary">
-            {{session('ventaCreada')}}
-        </p>
-    @endif
-    @if(Session::has('ventaEliminada'))
-        <p class="bg-warning">
-            {{session('ventaEliminada')}}
-        </p>
-    @endif
-    @if(Session::has('deshabilitado'))
-        <p class="bg-warning">
-            {{session('deshabilitado')}}
-        </p>
-    @endif
-     @if(Session::has('habilitado'))
-         <p class="bg-primary">
-             {{session('habilitado')}}
-         </p>
-     @endif
+
 {!! Form::open(['url' => ' ']) !!}
     <table id="myTable" class="table table-striped dt-responsive nowrap" style="width:100%">
         <thead>
@@ -54,10 +35,10 @@
             @if($ventas)
                 @foreach($ventas as $venta)
                     <tr>
-                        <td><a href="{{ route('detalleVenta', ['id'=>$venta->id]) }}">{{$venta->numero_factura}}</a></td>
+                        <td>{{$venta->numero_factura}}</td>
                         <td>{{$venta->user->name}}</td>
                         <td>{{$venta->cliente->nombre}}</td>
-                        <td>{{$venta->fecha}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($venta->fecha))}}</td>
                         <td>{{$venta->total}}</td>
                         <td>{{$venta->estado->nombre}}</td>
                         <td>

@@ -25,6 +25,11 @@
 @stop
 
 @section('content')
+@if(Session::has('error'))
+    <p class="bg-danger">
+        {{session('error')}}
+    </p>
+@endif
 @if(Session::has('eAuth'))
     <p class="bg-warning">
         {{session('eAuth')}}

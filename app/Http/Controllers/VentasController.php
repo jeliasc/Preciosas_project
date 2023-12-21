@@ -174,12 +174,8 @@ class VentasController extends Controller
         $venta=Venta::findOrFail($id);
         if(Auth::user()->can('ver ventas')){
             try {
-                $subTotalVenta=0;
                 $detalleVentas=$venta->detalleVentas;
-                foreach($detalleVentas as $detalleVenta){
-                    $subTotalVenta += ((($detalleVenta->cantidad*$detalleVenta->precio)+$detalleVenta->extra)-$detalleVenta->descuento);
-                }
-                return view('ventas.detalleVenta', compact('venta','detalleVentas', 'subTotalVenta'));
+                return view('ventas.detalleVenta', compact('venta','detalleVentas'));
             }catch (\Throwable $th){
                 $error="Error";
                 $error=$error. ''. $th->getMessage();
@@ -287,12 +283,12 @@ class VentasController extends Controller
             } catch (\Throwable $th) {
                 $error="Error";
                 $error=$error. ''. $th->getMessage();
-                Session::flash('eAut', $error);
+                Session::flash('error', $error);
                 return redirect()->back();
             }
         }else{
-            Session::flash('eAut','Error, permiso denegado');
-            return redirect('admin');
+            Session::flash('error','Error, permiso denegado');
+            return redirect('home');
         }  
     }
 }
