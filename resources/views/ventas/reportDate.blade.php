@@ -53,7 +53,7 @@
                         <td>{{$venta->numero_factura}}</td>
                         <td>{{$venta->user->name}}</td>
                         <td>{{$venta->cliente->nombre}}</td>
-                        <td>{{$venta->fecha}}</td>
+                        <td>{{date("d/m/y H:i:s", strtotime($venta->fecha))}}</td>
                         <td>{{$venta->total}}</td>
                         <td>{{$venta->tax}}</td>
                         <td>{{$venta->estado->nombre}}</td>

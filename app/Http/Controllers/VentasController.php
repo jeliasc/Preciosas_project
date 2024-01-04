@@ -228,8 +228,8 @@ class VentasController extends Controller
         $ventas = Venta::where('estado_id', '3')->get();
         if (Auth::user()->can('ver reporte de ventas')) {
             try{
-                $fi = $request->fechaInicio. '00:00:00';
-                $ff = $request->fechaFinal. '23:59:59';
+                $fi = $request->fechaInicio.' 00:00:00';
+                $ff = $request->fechaFinal.' 23:59:59';
                 $ventas=$ventas->whereBetween('fecha', [$fi, $ff]);
                 $total = $ventas->sum('total');
                 return view('ventas.reportDate', compact('ventas', 'total'));
