@@ -72,9 +72,6 @@
 
 @stop
 
-@section('css')
-@stop
-
 @section('js')
     <script src="{{ asset('js/dataTable/dataTable.js') }}"></script>
     <script src="{{ asset('js/preciosas/compras/compraCreate.js') }}"></script>

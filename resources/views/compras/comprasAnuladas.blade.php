@@ -18,7 +18,7 @@
         <thead>
             <tr>
                 <th scope="col">Id</th>
-                <th scope="col">User</th>
+                <th scope="col">Usuario</th>
                 <th scope="col">Proveedor</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Impuesto</th>
@@ -58,10 +58,6 @@
         </tbody>       
     </table>
 {!! Form::close() !!}
-@stop
-
-@section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
 @stop
 
 @section('js')
