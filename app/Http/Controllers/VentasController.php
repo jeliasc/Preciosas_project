@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Correlativo;
 use App\Models\Venta;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,273 +23,286 @@ class VentasController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
-        $ventas=Venta::where('estado_id','3')->get();
-        if(Auth::user()->can('ver ventas')){
+    public function index()
+    {
+        $ventas = Venta::where('estado_id', '3')->get();
+        if (Auth::user()->can('ver ventas')) {
             try {
-                return view('ventas.index', compact('ventas'));              
-            }catch (\Throwable $th){
-                $error="Error";
-                $error=$error . '' . $th->getMessage();
+                return view('ventas.index', compact('ventas'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
                 Session::flash('eAuth', $error);
                 return Redirect('home');
             }
-        }else{
+        } else {
             Session::flash('eAuth', 'Error, permiso denegado');
             return Redirect('home');
         }
     }
 
-    public function ventasAnuladas(){
-        $ventas=Venta::where('estado_id','4')->get();
-        if(Auth::user()->can('ver ventas')){
+    public function ventasAnuladas()
+    {
+        $ventas = Venta::where('estado_id', '4')->get();
+        if (Auth::user()->can('ver ventas')) {
             try {
-                return view('ventas.ventasAnuladas', compact('ventas'));              
-            }catch (\Throwable $th) {
-                $error="Error";
-                $error=$error . '' . $th->getMessage();
+                return view('ventas.ventasAnuladas', compact('ventas'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
                 Session::flash('eAuth', $error);
                 return Redirect('home');
             }
-        }else{
+        } else {
             Session::flash('eAut', 'Error, permiso denegado');
             return Redirect('admin');
         }
     }
 
-    public function create(){
+    public function create()
+    {
         $productos = DB::table('productos')
-        ->orderBy('nombre', 'asc')
-        ->where('estado_id','1')
-        ->get();
+            ->orderBy('nombre', 'asc')
+            ->where('estado_id', '1')
+            ->get();
 
         $clientes = DB::table('clientes')
-        ->orderBy('nombre', 'asc')
-        ->where('estado_id','1')
-        ->get();
+            ->orderBy('nombre', 'asc')
+            ->where('estado_id', '1')
+            ->get();
 
-        if(Auth::user()->can('crear ventas')){
+        if (Auth::user()->can('crear ventas')) {
             try {
-                return view('ventas.create', compact('productos','clientes'));
+                return view('ventas.create', compact('productos', 'clientes'));
             } catch (\Throwable $th) {
-                $error="Error";
-                $error=$error. '' .$th->getMessage();
-                Session::flash('eAuth',$error);
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
+                Session::flash('eAuth', $error);
                 return redirect('home');
             }
-        }else{
-            Session::flash('eAuth','Error, permiso denegado');
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
             return redirect('home');
-        } 
-    } 
+        }
+    }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $mensaje = '';
         $error = true;
         $entrada = $request->all();
         unset($request['_token']);
-        if(Auth::user()->can('crear ventas')){
+        if (Auth::user()->can('crear ventas')) {
             DB::connection('mysql')->beginTransaction();
             try {
-                if(empty($entrada)){
+                if (empty($entrada)) {
                     $error = true;
                     $mensaje = 'Error, no se pudo crear la compra';
-                }else{
+                } else {
 
-                $correlativo = Correlativo::pluck('ultimo_numero')->first();  
-                           
-                $correlativo_anterior = $correlativo;
-                $nuevo_correlativo = $correlativo_anterior + 1;
-                $numero_factura = $nuevo_correlativo;
-                      
-                $venta=Venta::create($request->all()+[
-                    'user_id' => Auth::user()->id,
-                    'fecha'=> Carbon::now('America/Guatemala'),
-                    'numero_factura' => $numero_factura,
-                ]);
+                    $correlativo = Correlativo::pluck('ultimo_numero')->first();
 
-                foreach ($request->producto_id as $key=>$p){
-                    $resultado[] = array('producto_id' => $request->producto_id[$key],
-                    "cantidad" => $request->cantidad[$key], 
-                    "precio" => $request->precio[$key],
-                    "descuento" => $request->descuento[$key], 
-                    "comentario" => $request->comentario[$key],
-                    "extra" => $request->extra[$key]);
-                }   
-                $venta->detalleVentas()->createMany($resultado);
+                    $correlativo_anterior = $correlativo;
+                    $nuevo_correlativo = $correlativo_anterior + 1;
+                    $numero_factura = $nuevo_correlativo;
 
-                $c = Correlativo::where('id','1')->first(); 
-                $c->ultimo_numero = $nuevo_correlativo;
-                $c->save();
-                DB::connection('mysql')->commit();
-                $error = false;
-                $mensaje ='Venta creada con éxito';
-                }                   
-            }catch (\Throwable $th){
-                $error='Error ';
-                $error=$error . '' . $th->getMessage();
+                    $venta = Venta::create($request->all() + [
+                        'user_id' => Auth::user()->id,
+                        'fecha' => Carbon::now('America/Guatemala'),
+                        'numero_factura' => $numero_factura,
+                    ]);
+
+                    foreach ($request->producto_id as $key => $p) {
+                        $resultado[] = array(
+                            'producto_id' => $request->producto_id[$key],
+                            "cantidad" => $request->cantidad[$key],
+                            "precio" => $request->precio[$key],
+                            "descuento" => $request->descuento[$key],
+                            "comentario" => $request->comentario[$key],
+                            "extra" => $request->extra[$key]
+                        );
+                    }
+                    $venta->detalleVentas()->createMany($resultado);
+
+                    $c = Correlativo::where('id', '1')->first();
+                    $c->ultimo_numero = $nuevo_correlativo;
+                    $c->save();
+                    DB::connection('mysql')->commit();
+                    $error = false;
+                    $mensaje = 'Venta creada con éxito';
+                }
+            } catch (\Throwable $th) {
+                $error = 'Error ';
+                $error = $error . '' . $th->getMessage();
                 DB::connection('mysql')->rollBack();
                 $error = true;
-                $mensaje = 'Error '.$th->getMessage();
+                $mensaje = 'Error ' . $th->getMessage();
             }
-        }else {
+        } else {
             $error = true;
             $mensaje = 'Permiso denegado';
         }
         return Response::json(array('error' => $error, 'mensaje' => $mensaje));
     }
 
-    public function destroy($id){
-        if(auth::user()->can('eliminar ventas')){
-                DB::connection('mysql')->beginTransaction();
+    public function destroy($id)
+    {
+        if (auth::user()->can('eliminar ventas')) {
+            DB::connection('mysql')->beginTransaction();
             try {
                 $mensaje = '';
                 $error = true;
                 $venta = Venta::where('id', $id)->first();
-                
-                if(empty($venta)){
+
+                if (empty($venta)) {
                     $error = true;
                     $mensaje = 'La venta no existe';
-                }else if($venta->estado_id == 3){
+                } else if ($venta->estado_id == 3) {
                     $error = false;
                     $venta->estado_id = 4;
-                    $mensaje ='Venta anulada con éxito';
+                    $mensaje = 'Venta anulada con éxito';
                     DB::connection('mysql')->commit();
                     $venta->save();
-                }else{
+                } else {
                     $error = true;
-                    $mensaje ='La venta esta anulada';
+                    $mensaje = 'La venta esta anulada';
                 }
-            }catch(\Throwable $th){
+            } catch (\Throwable $th) {
                 $error = true;
-                $mensaje = 'Error '.$th->getMessage();  
+                $mensaje = 'Error ' . $th->getMessage();
             }
-        }else{
-                $error = true;
-                $mensaje = 'Permiso denegado'; 
-            }
+        } else {
+            $error = true;
+            $mensaje = 'Permiso denegado';
+        }
         return Response::json(array('error' => $error, 'mensaje' => $mensaje));
     }
 
-    public function detalleVenta($id){
-        $venta=Venta::findOrFail($id);
-        if(Auth::user()->can('ver ventas')){
+    public function detalleVenta($id)
+    {
+        $venta = Venta::findOrFail($id);
+        if (Auth::user()->can('ver ventas')) {
             try {
-                $detalleVentas=$venta->detalleVentas;
-                return view('ventas.detalleVenta', compact('venta','detalleVentas'));
-            }catch (\Throwable $th){
-                $error="Error";
-                $error=$error. ''. $th->getMessage();
+                $detalleVentas = $venta->detalleVentas;
+                return view('ventas.detalleVenta', compact('venta', 'detalleVentas'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
                 Session::flash('eAuth', $error);
                 return redirect('home');
             }
-        }else{
-            Session::flash('eAuth','Error, permiso denegado');
-            return redirect('home');
-        }   
-    }
-
-    public function reportDay(){
-        $ventas = Venta::whereDate('fecha', Carbon::today('America/Guatemala'))->where('estado_id', '3')->get();
-        if(Auth::user()->can('ver reporte de ventas')){
-            try{
-                $total = $ventas->sum('total');
-                return view('ventas.reportDay', compact('ventas', 'total'));
-            }catch (\Throwable $th){
-                $error="Error";
-                $error=$error. ''. $th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
-            }
-        }else{
-            Session::flash('eAuth','Error, permiso denegado');
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
             return redirect('home');
         }
     }
 
-    public function reportDate(){
-        $ventas = Venta::where('estado_id', '3')->get();
-        if(Auth::user()->can('ver reporte de ventas')){
-            try{
+    public function reportDay()
+    {
+        $ventas = Venta::whereDate('fecha', Carbon::today('America/Guatemala'))->where('estado_id', '3')->get();
+        if (Auth::user()->can('ver reporte de ventas')) {
+            try {
                 $total = $ventas->sum('total');
-                return view('ventas.reportDate', compact('total', 'ventas'));
-            }catch (\Throwable $th){
-                $error="Error";
-                $error=$error. ''. $th->getMessage();
+                return view('ventas.reportDay', compact('ventas', 'total'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
                 Session::flash('eAuth', $error);
-                return redirect('home');    
-            }              
-        }else{
-            Session::flash('eAuth','Error, permiso denegado');
+                return redirect('home');
+            }
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
             return redirect('home');
-        } 
+        }
     }
 
-    public function reportResult(Request $request){
+    public function reportDate()
+    {
         $ventas = Venta::where('estado_id', '3')->get();
         if (Auth::user()->can('ver reporte de ventas')) {
-            try{
-                $fi = $request->fechaInicio.' 00:00:00';
-                $ff = $request->fechaFinal.' 23:59:59';
-                $ventas=$ventas->whereBetween('fecha', [$fi, $ff]);
+            try {
+                $total = $ventas->sum('total');
+                return view('ventas.reportDate', compact('total', 'ventas'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
+                Session::flash('eAuth', $error);
+                return redirect('home');
+            }
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
+        }
+    }
+
+    public function reportResult(Request $request)
+    {
+        $ventas = Venta::where('estado_id', '3')->get();
+        if (Auth::user()->can('ver reporte de ventas')) {
+            try {
+                $fi = $request->fechaInicio . ' 00:00:00';
+                $ff = $request->fechaFinal . ' 23:59:59';
+                $ventas = $ventas->whereBetween('fecha', [$fi, $ff]);
                 $total = $ventas->sum('total');
                 return view('ventas.reportDate', compact('ventas', 'total'));
-            }catch (\Throwable $th){
-                $error="Error";
-                $error=$error. ''. $th->getMessage();
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
                 Session::flash('eAuth', $error);
-                return redirect('home'); 
+                return redirect('home');
             }
-        }else{
-            Session::flash('eAuth','Error, permiso denegado');
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
             return redirect('home');
-        }     
-    } 
-    public function pdf($id){
+        }
+    }
+    public function pdf($id)
+    {
         $venta = Venta::findOrFail($id);
         if (Auth::user()->can('ver ventas')) {
             try {
-                $detalleVentas=$venta->detalleVentas;
-                $pdf = Pdf::loadView('ventas.pdf', compact('venta','detalleVentas'));
-                return $pdf->download('Reporte_de_venta_'.$venta->id.'.pdf');            
+                $detalleVentas = $venta->detalleVentas;
+                $pdf = Pdf::loadView('ventas.pdf', compact('venta', 'detalleVentas'));
+                return $pdf->download('Reporte_de_venta_' . $venta->id . '.pdf');
             } catch (\Throwable $th) {
-                $error="Error";
-                $error=$error. ''. $th->getMessage();
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
                 Session::flash('eAut', $error);
                 return redirect('admin');
             }
-        }else {
-            Session::flash('eAut','Error, permiso denegado');
+        } else {
+            Session::flash('eAut', 'Error, permiso denegado');
             return redirect('admin');
-        }  
+        }
     }
-    public function print($id){
+    public function print($id)
+    {
         $venta = Venta::findOrFail($id);
-        if(Auth::user()->can('ver ventas')){
-            try{
-                $subtotal=0;
-                $detalleVentas=$venta->detalleVentas;
-                foreach($detalleVentas as $detalleVenta){
-                    $subtotal += ((($detalleVenta->cantidad*$detalleVenta->precio)+$detalleVenta->extra)-$detalleVenta->descuento);
+        if (Auth::user()->can('ver ventas')) {
+            try {
+                $subtotal = 0;
+                $detalleVentas = $venta->detalleVentas;
+                foreach ($detalleVentas as $detalleVenta) {
+                    $subtotal += ((($detalleVenta->cantidad * $detalleVenta->precio) + $detalleVenta->extra) - $detalleVenta->descuento);
                 }
                 $printer_name = "TM20";
                 $connector = new WindowsPrintConnector($printer_name);
-                $printer = new Printer($connector);   
-                $printer->text("Q. 9,95\n"); 
+                $printer = new Printer($connector);
+                $printer->text("Q. 9,95\n");
                 $printer->cut();
                 $printer->close();
                 return redirect()->back();
                 Session::flash('print', 'Impresión realizada con éxito');
                 return redirect()->back();
             } catch (\Throwable $th) {
-                $error="Error";
-                $error=$error. ''. $th->getMessage();
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
                 Session::flash('error', $error);
                 return redirect()->back();
             }
-        }else{
-            Session::flash('error','Error, permiso denegado');
+        } else {
+            Session::flash('error', 'Error, permiso denegado');
             return redirect('home');
-        }  
+        }
     }
 }
