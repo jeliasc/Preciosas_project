@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <form id="createForm">
-                @CSRF
+                    @csrf
                 <div class="table table-responsive">
                         <table class="table">
                             <tbody>

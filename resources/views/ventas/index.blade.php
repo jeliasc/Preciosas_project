@@ -79,6 +79,6 @@
 
 @section('js')
     <script src="{{ asset('js/dataTable/dataTable.js') }}"></script>
-    <script src="{{ asset('js/ventas/ventaDelete.js') }}"></script>
+    <script src="{{ asset('js/preciosas/ventas/ventaDelete.js') }}"></script>
 @stop
         

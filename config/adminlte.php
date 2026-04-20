@@ -252,14 +252,14 @@ return [
     |
     */
 
-    'use_route_url' => false,
-    'dashboard_url' => 'home',
-    'logout_url' => 'logout',
-    'login_url' => 'login',
-    'register_url' => 'register',
-    'password_reset_url' => 'password/reset',
-    'password_email_url' => 'password/email',
-    'profile_url' => false,
+        'use_route_url' => false,
+        'dashboard_url' => 'home',
+        'logout_url' => 'logout',
+        'login_url' => 'login',
+        'register_url' => 'register',
+        'password_reset_url' => 'password/reset',
+        'password_email_url' => 'password/email',
+        'profile_url' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -329,7 +329,7 @@ return [
             'text' => 'ARTÍCULOS',
             'route'  => 'articulosIndex',
             'icon_color' => 'primary',
-            'can'  => 'ver productos',
+            'can'  => 'ver articulos',
         ],
         [
             'text' => 'CLIENTES',
@@ -338,7 +338,7 @@ return [
             'can'  => 'ver clientes',
         ],
         [
-            'text'    => 'COMPRAS', 
+            'text'    => 'COMPRAS',
             'icon_color' => 'primary',
             'can'  => 'ver compras',
             'submenu' => [
@@ -348,7 +348,7 @@ return [
                     'icon'    => 'fa fa-duotone fa-check-double',
                     'icon_color' => 'primary',
                     'can'  => 'ver compras',
-  
+
                 ],
                 [
                     'text' => 'Compras Anuladas',
@@ -357,10 +357,24 @@ return [
                     'icon_color' => 'primary',
                     'can'  => 'ver compras',
                 ],
+                [
+                    'text' => 'Reporte por Día',
+                    'route'  => 'compra.reportDay',
+                    'icon'    => 'fa fa-sharp fa-solid fa-file-lines',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver reporte de ventas',
+                ],
+                [
+                    'text' => 'Reporte por Fecha',
+                    'route'  => 'compra.reportDate',
+                    'icon'    => 'fa fa-sharp fa-solid fa-file-lines',
+                    'icon_color' => 'primary',
+                    'can'  => 'ver reporte de ventas',
+                ],
             ],
         ],
         [
-            'text'    => 'VENTAS',  
+            'text'    => 'VENTAS',
             'icon_color' => 'primary',
             'can'  => 'crear ventas',
             'submenu' => [
@@ -370,7 +384,7 @@ return [
                     'icon'    => 'fa fa-solid fa-plus',
                     'icon_color' => 'primary',
                     'can'  => 'crear ventas',
-  
+
                 ],
                 [
                     'text' => 'Ventas Facturadas',
@@ -378,7 +392,7 @@ return [
                     'icon'    => 'fa fa-duotone fa-check-double',
                     'icon_color' => 'primary',
                     'can'  => 'ver reporte de ventas',
-  
+
                 ],
                 [
                     'text' => 'Ventas Anuladas',
@@ -410,14 +424,14 @@ return [
             'icon' => 'fa-solid fa-user-gear',
             'icon_color' => 'primary',
             'can'  => 'ver roles',
-        ], 
+        ],
         [
             'text' => 'USUARIOS',
             'route'  => 'usuariosIndex',
             'icon' => 'fas fa fa-users',
             'icon_color' => 'primary',
             'can'  => 'ver usuarios',
-        ], 
+        ],
         [
             'text' => 'profile',
             'url'  => 'admin/settings',
@@ -527,7 +541,7 @@ return [
     'plugins' => [
         'Datatables' => [
             'active' => true,
-            'files' => [  
+            'files' => [
                 [
                     'type' => 'css',
                     'asset' => false,
@@ -542,7 +556,7 @@ return [
                     'type' => 'css',
                     'asset' => false,
                     'location' => '//cdn.datatables.net/responsive/2.4.0/css/responsive.bootstrap5.min.css',
-                ], 
+                ],
                 [
                     'type' => 'js',
                     'asset' => false,
@@ -578,7 +592,7 @@ return [
                     'asset' => false,
                     'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js',
                 ],
-               
+
             ],
         ],
         'Chartjs' => [
@@ -649,7 +663,7 @@ return [
                     'asset' => false,
                     'location' => '//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css',
                 ],
-                
+
             ],
         ],
         'font-awesome' => [

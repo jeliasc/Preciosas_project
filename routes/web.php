@@ -76,8 +76,12 @@ Route::get('comprasAnuladas',[ComprasController::class, 'comprasAnuladas'])->nam
 Route::get('crearCompra', [ComprasController::class, 'create'])->name('crearCompra');
 Route::post('insertarCompra', [ComprasController::class, 'store'])->name('insertarCompra');
 Route::get('eliminarCompra/{id}',[ComprasController::class, 'destroy'])->name('eliminarCompra');
+Route::get('compra/reportDay',[ComprasController::class, 'reportDay'])->name('compra.reportDay');
+Route::get('compra/reportDate',[ComprasController::class, 'reportDate'])->name('compra.reportDate');
+Route::post('compra/reportResult',[ComprasController::class, 'reportResult'])->name('compra.reportResult');
 Route::get('detalleCompra/{id}',[ComprasController::class, 'detalleCompra'])->name('detalleCompra');
 Route::get('compra/pdf/{id}',[ComprasController::class, 'pdf'])->name('compra.pdf');
+Route::get('compras/ReportePdf',[ComprasController::class, 'ReportePdf'])->name('compras.ReportePdf');
 
 Route::get('ventasIndex',[VentasController::class, 'index'])->name('ventasIndex');
 Route::get('ventasAnuladas',[VentasController::class, 'ventasAnuladas'])->name('ventasAnuladas');
@@ -89,6 +93,7 @@ Route::get('venta/reportDay',[VentasController::class, 'reportDay'])->name('vent
 Route::get('venta/reportDate',[VentasController::class, 'reportDate'])->name('venta.reportDate');
 Route::post('venta/reportResult',[VentasController::class, 'reportResult'])->name('venta.reportResult');
 Route::get('venta/pdf/{id}',[VentasController::class, 'pdf'])->name('venta.pdf');
+Route::get('ventas/ReportePdf',[VentasController::class, 'ReportePdf'])->name('ventas.ReportePdf');
 Route::get('venta/print/{id}',[VentasController::class, 'print'])->name('venta.print');
 
 

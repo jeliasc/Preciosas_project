@@ -1,4 +1,4 @@
 $('select').select2({
-    placeholder: 'Search',
+    placeholder: 'Buscar',
     allowClear: true
     });

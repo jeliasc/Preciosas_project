@@ -1,18 +1,9 @@
-@extends('adminlte::page')
-
-@section('title', 'Dashboard')
-
-@section('content_header')
-    <h1 align="center">Reporte de Ventas</h1>
-@stop
-
-@section('content')     
-     {!! Form::open(['url' => ' ']) !!}
+<h3 align="center">Reporte de Ventas</h3>
      <div class="row">
         <div class="col-12 col-md-4 text-center">
             <span>Fecha de Consulta</span>
             <div class="form-group">
-                <strong>{{\Carbon\Carbon::now()->format('d/m/Y H:i:s')}} <br><br></strong>
+                <strong>{{\Carbon\Carbon::now()->format("d/m/Y H:i:s")}} <br><br></strong>
             </div>
         </div>
         <div class="col-12 col-md-4 text-center">
@@ -28,10 +19,9 @@
             </div>
         </div>
     </div>
-    {!! Form::close() !!}
     <table id="myTable" class="table table-striped dt-responsive nowrap" style="width:100%">
         <thead>
-            <tr>
+            <tr align="left">
                 <th scope="col">No. Factura</th>
                 <th scope="col">Usuario</th>
                 <th scope="col">Cliente</th>
@@ -48,22 +38,15 @@
                         <td>{{$venta->numero_factura}}</td>
                         <td>{{$venta->user->name}}</td>
                         <td>{{$venta->cliente->nit}}</td>
-                        <td>{{date("d/m/y H:i:s", strtotime($venta->fecha))}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($venta->fecha))}}</td>
                         <td>{{$venta->total}}</td>
                         <td>{{$venta->tax}}</td>
                         <td>{{$venta->estado->nombre}}</td>
                     </tr>
                 @endforeach
-                <a href="{{ route('ventas.ReportePdf') }}">Convertir a pdf <i class="fa fa-regular fa-file-pdf" title="Exportar a PDF" aria-hidden="true"></i></a>
             @endif
         </tbody>       
     </table>
-@stop
-
-@section('css')
-@stop
-
-@section('js')
     <script src="{{ asset('js/preciosas/ventas/fecha.js') }}"></script>
-@stop
+
         

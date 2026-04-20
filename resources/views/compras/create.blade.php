@@ -13,6 +13,10 @@
                         <table class="table">
                             <tbody>
                                 <tr>
+                                    <td><label>No. de Factura</label></td>
+                                    <td><input type="text" class="form-control" name="no_fac" id="no_fac"></td>
+                                </tr>
+                                <tr>
                                     <td><label>Artículo</label></td>
                                     <td>
                                         <select name="producto_id" id="producto_id" class="form-select">

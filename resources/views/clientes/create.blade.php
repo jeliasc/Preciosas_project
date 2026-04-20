@@ -24,7 +24,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><label>Nombre</label></td>
+                                    <td><label>Nombres y Apellidos</label></td>
                                     <td><input class="form-control" type="text" id="nombre" name="nombre">
                                         @error('nombre')
                                             <small> 

@@ -90,6 +90,8 @@ class ComprasController extends Controller
         $mensaje = '';
         $error = true;
         $entrada = $request->all();
+        $no_fact = $request->input('no_fac');
+
         unset($request['_token']);
 
         if (Auth::user()->can('crear compras',)) {
@@ -102,6 +104,7 @@ class ComprasController extends Controller
                     $compra = Compra::create($request->all() + [
                         'user_id' => Auth::user()->id,
                         'fecha' => Carbon::now('America/Guatemala'),
+                        'no_factura' => $no_fact,
                     ]);
                     foreach ($request->producto_id as $key => $producto) {
                         $resultado[] = array(
@@ -178,6 +181,66 @@ class ComprasController extends Controller
         }
     }
 
+    public function reportDay()
+    {
+        $compras = Compra::whereDate('fecha', Carbon::today('America/Guatemala'))->where('estado_id', '3')->get();
+        if (Auth::user()->can('ver reporte de ventas')) {
+            try {
+                $total = $compras->sum('total');
+                return view('compras.reportDay', compact('compras', 'total'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
+                Session::flash('eAuth', $error);
+                return redirect('home');
+            }
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
+        }
+    }
+
+    public function reportDate()
+    {
+        $compras = Compra::where('estado_id', '3')->get();
+        if (Auth::user()->can('ver reporte de ventas')) {
+            try {
+                $total = $compras->sum('total');
+                return view('compras.reportDate', compact('total', 'compras'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
+                Session::flash('eAuth', $error);
+                return redirect('home');
+            }
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
+        }
+    }
+
+    public function reportResult(Request $request)
+    {
+        $compras = Compra::where('estado_id', '3')->get();
+        if (Auth::user()->can('ver reporte de ventas')) {
+            try {
+                $fi = $request->fechaInicio . ' 00:00:00';
+                $ff = $request->fechaFinal . ' 23:59:59';
+                $compras = $compras->whereBetween('fecha', [$fi, $ff]);
+                $total = $compras->sum('total');
+                return view('compras.reportDate', compact('compras', 'total'));
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
+                Session::flash('eAuth', $error);
+                return redirect('home');
+            }
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
+        }
+    }
+
     public function pdf($id)
     {
         $compra = Compra::findOrFail($id);
@@ -189,12 +252,32 @@ class ComprasController extends Controller
             } catch (\Throwable $th) {
                 $error = "Error";
                 $error = $error . '' . $th->getMessage();
-                Session::flash('eAut', $error);
-                return redirect('admin');
+                Session::flash('eAuth', $error);
+                return redirect('home');
             }
         } else {
-            Session::flash('eAut', 'Error, permiso denegado');
-            return redirect('admin');
+            Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
+        }
+    }
+
+    public function ReportePdf()
+    {
+        $compras = Compra::whereDate('fecha', Carbon::today('America/Guatemala'))->get();
+        if (Auth::user()->can('ver compras')) {
+            try {
+                $total = $compras->sum('total');
+                $pdf = Pdf::loadView('compras.reportDayPdf', compact('compras', 'total'));
+                return $pdf->download('Reporte_de_compras_'. Carbon::now()->format("d/m/Y H:i:s") .'.pdf');
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
+                Session::flash('eAuth', $error);
+                return redirect('home');
+            }
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
         }
     }
 }

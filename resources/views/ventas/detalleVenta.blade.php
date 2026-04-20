@@ -5,7 +5,7 @@
 @section('content_header')
 <div>
     <label class="form-control-label" for="fecha_compra">Fecha de venta</label>
-    <p>{{date("d/m/y H:i:s", strtotime($venta->fecha))}}</p>
+    <p>{{date("d/m/Y H:i:s", strtotime($venta->fecha))}}</p>
 </div>
 @stop
 
@@ -18,8 +18,13 @@
     </div>
     <div  class="col-12 col-md-3 text-center">
         <label class="form-control-label" for="nombre">Cliente</label>
-            <br>{{$venta->cliente->nombre}}
-        </p>
+            <br>
+            <p>{{$venta->cliente->nombre}}</p>
+    </div>
+        <div  class="col-12 col-md-3 text-center">
+        <label class="form-control-label" for="nombre">No. Factura</label>
+            <br>
+            <p>{{$venta->numero_factura}}</p>
     </div>
 </div>
 <div class="form-group row">

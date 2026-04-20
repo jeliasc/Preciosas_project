@@ -259,7 +259,7 @@ class VentasController extends Controller
     public function pdf($id)
     {
         $venta = Venta::findOrFail($id);
-        if (Auth::user()->can('ver ventas')) {
+        if (Auth::user()->can('ver reporte de ventas')) {
             try {
                 $detalleVentas = $venta->detalleVentas;
                 $pdf = Pdf::loadView('ventas.pdf', compact('venta', 'detalleVentas'));
@@ -273,6 +273,25 @@ class VentasController extends Controller
         } else {
             Session::flash('eAut', 'Error, permiso denegado');
             return redirect('admin');
+        }
+    }
+    public function ReportePdf()
+    {
+        $ventas = Venta::whereDate('fecha', Carbon::today('America/Guatemala'))->get();
+        if (Auth::user()->can('ver reporte de ventas')) {
+            try {
+                $total = $ventas->sum('total');
+                $pdf = Pdf::loadView('ventas.reportDayPdf', compact('ventas', 'total'));
+                return $pdf->download('Reporte_de_ventas_'. Carbon::now()->format("d/m/Y H:i:s") .'.pdf');
+            } catch (\Throwable $th) {
+                $error = "Error";
+                $error = $error . '' . $th->getMessage();
+                Session::flash('eAuth', $error);
+                return redirect('home');
+            }
+        } else {
+            Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
         }
     }
     public function print($id)

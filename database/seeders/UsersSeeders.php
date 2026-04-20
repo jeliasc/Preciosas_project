@@ -46,11 +46,6 @@ class UsersSeeders extends Seeder
         Permission::create(['name'=>'editar proveedores'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'eliminar proveedores'])->syncRoles([$superadminRole]);
 
-        Permission::create(['name'=>'ver productos'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'crear productos'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'editar productos'])->syncRoles([$superadminRole]);
-        Permission::create(['name'=>'eliminar productos'])->syncRoles([$superadminRole]);
-
         Permission::create(['name'=>'ver clientes'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'crear clientes'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'editar clientes'])->syncRoles([$superadminRole]);

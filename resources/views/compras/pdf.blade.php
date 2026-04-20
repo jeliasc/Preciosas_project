@@ -119,7 +119,7 @@
                 </table>
             </div>
             <div id="fact">
-                <h6>Compra no. <br> {{$compra->id}}</h6> 
+                <h6>No. Factura<br> {{$compra->no_factura}}</h6> 
             </div>
         </header>
         <br>
@@ -136,7 +136,7 @@
                     <tbody>
                         <tr id="user">
                             <td>{{$compra->user->name}}</td>
-                            <td>{{$compra->fecha}}</td>
+                            <td>{{date("d/m/Y H:i:s", strtotime($compra->fecha))}}</td>
                         </tr>
                     </tbody>
                 </table>

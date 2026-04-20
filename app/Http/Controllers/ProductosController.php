@@ -20,7 +20,7 @@ class ProductosController extends Controller{
     }
 
     public function index(){
-        if (Auth::user()->can('ver productos')) {
+        if (Auth::user()->can('ver articulos')) {
             try {
                 $productos = Producto::all();
                 return view('productos.index', compact('productos'));
@@ -37,7 +37,7 @@ class ProductosController extends Controller{
     }
 
     public function create(){
-        if(Auth::user()->can('crear productos')){
+        if(Auth::user()->can('crear articulos')){
             try {
                 $mensaje = '';
                 $error = true;
@@ -74,7 +74,7 @@ class ProductosController extends Controller{
         $tamagno_imagen = $_FILES['foto_id']['size'];
         unset($entrada['_token']);
 
-        if(Auth::user()->can('crear productos',)){
+        if(Auth::user()->can('crear articulos',)){
             DB::connection('mysql')->beginTransaction();
             try { 
                 if(empty($entrada)){
@@ -129,7 +129,7 @@ class ProductosController extends Controller{
     }
 
     public function edit(Request $request, $id){
-        if(Auth::user()->can('editar productos')){
+        if(Auth::user()->can('editar articulos')){
             try {
                 $mensaje = '';
                 $error = true;
@@ -176,7 +176,7 @@ class ProductosController extends Controller{
         $mensaje = '';
         $error = true;
         
-        if(Auth::user()->can('editar productos',)){
+        if(Auth::user()->can('editar articulos',)){
             DB::connection('mysql')->beginTransaction();
             try {
                 if(empty($request)){
@@ -232,7 +232,7 @@ class ProductosController extends Controller{
     }
 
     public function destroy($id){
-        if (auth::user()->can('eliminar productos')) {
+        if (auth::user()->can('eliminar articulos')) {
 
                 DB::connection('mysql')->beginTransaction();
             try 

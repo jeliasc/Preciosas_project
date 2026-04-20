@@ -10,7 +10,7 @@
 @endif
 <div>
     <label class="form-control-label" for="fecha_compra">Fecha de compra </label>
-    <p>{{date("d/m/y H:i:s", strtotime($compra->fecha))}}</p>
+    <p>{{date("d/m/Y H:i:s", strtotime($compra->fecha))}}</p>
 </div>
 @stop
 
@@ -22,8 +22,8 @@
         <p>{{$compra->proveedor->nombre}}</p>
     </div>
     <div class="col-md-6 text-center">
-        <label class="form-control-label" for="numero_compra">Compra no. </label>
-        <p>{{$compra->id}}</p>
+        <label class="form-control-label" for="numero_compra">No. Factura </label>
+        <p>{{$compra->no_factura}}</p>
     </div>
 </div>
 <div class="form-group row">

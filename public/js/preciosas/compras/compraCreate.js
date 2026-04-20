@@ -45,7 +45,6 @@ function compraCreate() {
                         textoProd += '<option value="'+producto.id+'">'+producto.nombre+'</option>';
                     }
                 });
-
                 $("#proveedor_id" ).append(textoProv);
                 $("#producto_id" ).append(textoProd);
                 $('#createModal').modal('show');  

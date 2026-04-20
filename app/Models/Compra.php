@@ -9,6 +9,7 @@ class Compra extends Model
 {
     use HasFactory;
     protected $fillable=[
+        'no_factura',
         'user_id',
         'proveedor_id',
         'fecha',

@@ -10,20 +10,20 @@
 <p>Ingresar los datos requeridos.</p>
     <form id="createForm">
         @CSRF
-       <table id="table" class="table table-striped dt-responsive nowrap">      
+       <table id="table" class="table table-striped dt-responsive nowrap" width="50%">      
             <tr>
                 <td>{!! Form::label('cliente_id', 'Cliente') !!}</td>
                 <td> 
-                    <select name="cliente_id" id="cliente_id">
+                    <select name="cliente_id" id="cliente_id" class="form-select">
                         <option value="">Seleccione un cliente</option>
                         @foreach ($clientes as $cliente)
-                            <option value="{{ $cliente->id }}">{{ $cliente->nombre}}</option>
+                            <option value="{{ $cliente->id }}">{{$cliente->nit}} {{$cliente->nombre}}</option>
                         @endforeach
                     </select>  
                 </td>
                 <td>{!! Form::label('producto_id', 'Artículo') !!}</td>
                 <td> 
-                    <select name="producto_id" id="producto_id">
+                    <select name="producto_id" id="producto_id" class="form-select">
                     <option value="">Seleccione un artículo</option>
                         @foreach ($productos as $producto)
                             <option value="{{ $producto->id }}_{{ $producto->stock }}_{{ $producto->precio }}">{{ $producto->nombre}}</option>
@@ -120,7 +120,7 @@
 @stop
 
 @section('js')
-<script src="{{ asset('js/ventas/ventaCreate.js') }}"></script>
+<script src="{{ asset('js/preciosas/ventas/ventaCreate.js') }}"></script>
 <script src="{{ asset('js/select.js') }}"></script>
 @stop
 

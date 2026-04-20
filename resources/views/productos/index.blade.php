@@ -7,7 +7,7 @@
 @stop
 
 @section('content')
-@can('crear productos')
+@can('crear articulos')
     <p><a class="btn btn-outline-success" type="button" onclick="return productoCreate()">Nuevo</a></p>
 @endcan
 
@@ -55,12 +55,12 @@
                         <td>
                             <div class="row">
                                 <div class="col-md-6">
-                                    @can('editar productos')
+                                    @can('editar articulos')
                                         <a  class="btn-modal-editar" type="button" onclick="return productoEdit({{$producto->id}})"> <i class="fa fa-pencil-square-o" title="Editar productos" aria-hidden="true"></i></a>
                                     @endcan
                                 </div>
                                 <div class="col-md-6">
-                                    @can('eliminar productos')
+                                    @can('eliminar articulos')
                                             @if ($producto->estado_id == 2)
                                                 <a  class="btn-modal-editar" type="button" onclick="return productoDelete({{$producto->id}})"><i class="fa fa-check-square-o" aria-hidden="true" title="Habilitar productos"></i></a>
                                             @else

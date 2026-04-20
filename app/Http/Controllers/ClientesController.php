@@ -18,7 +18,7 @@ class ClientesController extends Controller
     }
 
     public function index(){
-        if (Auth::user()->can('ver productos')) {
+        if (Auth::user()->can('ver clientes')) {
             try {
                 $clientes = Cliente::all();
                 return view('clientes.index', compact('clientes'));

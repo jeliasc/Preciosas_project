@@ -3,11 +3,11 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1 align="center">Reporte de Ventas</h1>
+    <h1 align="center">Reporte de Compras</h1>
 @stop
 
 @section('content')     
-{!! Form::open(['method' => 'post', 'action'=>'App\Http\Controllers\VentasController@reportResult', 'files'=>true]) !!}
+{!! Form::open(['method' => 'post', 'action'=>'App\Http\Controllers\ComprasController@reportResult', 'files'=>true]) !!}
     <div class="row">
         <div class="col-12 col-md-3 text-center">
             <span>Fecha Inicial</span>
@@ -27,7 +27,7 @@
             </div>
         </div>   
         <div class="col-12 col-md-3 text-center">
-            <span>Total de Ingresos</span>
+            <span>Total de Egresos</span>
             <div class="form-group">
                 <strong>Q. {{$total}} <br><br></strong>
             </div>
@@ -39,7 +39,7 @@
             <tr>
                 <th scope="col">No. Factura</th>
                 <th scope="col">Usuario</th>
-                <th scope="col">Cliente</th>
+                <th scope="col">Proveedor</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Total</th>
                 <th scope="col">Impuesto</th>
@@ -47,16 +47,16 @@
             </tr>
         </thead>
         <tbody>
-            @if($ventas)
-                @foreach($ventas as $venta)
+            @if($compras)
+                @foreach($compras as $compra)
                     <tr>
-                        <td>{{$venta->numero_factura}}</td>
-                        <td>{{$venta->user->name}}</td>
-                        <td>{{$venta->cliente->nit}}</td>
-                        <td>{{date("d/m/Y H:i:s", strtotime($venta->fecha))}}</td>
-                        <td>{{$venta->total}}</td>
-                        <td>{{$venta->tax}}</td>
-                        <td>{{$venta->estado->nombre}}</td>
+                        <td>{{$compra->no_factura}}</td>
+                        <td>{{$compra->user->name}}</td>
+                        <td>{{$compra->proveedor->nombre}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($compra->fecha))}}</td>
+                        <td>{{$compra->total}}</td>
+                        <td>{{$compra->tax}}</td>
+                        <td>{{$compra->estado->nombre}}</td>
                     </tr>
                 @endforeach
             @endif
