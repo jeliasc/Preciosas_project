@@ -21,9 +21,17 @@ function roleCreate() {
                 permisosContainer.empty();
 
                 permissions.forEach(permission => {
-                    texto = $('<input type="checkbox" name="permissions[]" value="' + permission.id + '"> ' + permission.name + '<br>');
+                    texto = $(
+                        '<label>' +
+                            '<input type="checkbox" class="permiso-check" name="permissions[]" value="' + permission.id + '"> ' +
+                            permission.name +
+                        '</label><br>'
+                    );
+
                     permisosContainer.append(texto);
                 });
+
+                $("#seleccionar_todos_permisos").prop("checked", false);
 
                 $('#createModal').modal('show');   
             }
@@ -79,3 +87,14 @@ function roleInsert() {
         }
     })                       
 }
+
+$(document).on('change', '#seleccionar_todos_permisos', function () {
+    $('.permiso-check').prop('checked', $(this).is(':checked'));
+});
+
+$(document).on('change', '.permiso-check', function () {
+    let total = $('.permiso-check').length;
+    let marcados = $('.permiso-check:checked').length;
+
+    $('#seleccionar_todos_permisos').prop('checked', total === marcados);
+});

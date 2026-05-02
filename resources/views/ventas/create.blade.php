@@ -107,10 +107,10 @@
         <table> 
             <tr>
                 <td>         
-                    <a id="guardarC" class="btn btn-outline-primary" onclick="return ventaInsert()">Resgistrar</a>
+                    <a id="guardarV" class="btn btn-outline-primary" onclick="return ventaInsert()">Resgistrar</a>
                 </td>   
                 <td>                     
-                    <a class="btn btn-outline-danger" href="{{ route('comprasIndex') }}" role="button">Cancelar</a>
+                    <a class="btn btn-outline-danger" href="{{ route('ventasIndex') }}" role="button">Cancelar</a>
                 </td>
             </tr> 
         </table>    

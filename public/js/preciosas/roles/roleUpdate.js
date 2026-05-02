@@ -35,10 +35,10 @@ function roleEdit(id) {
                     }else{
                         check = "";
                     }
-                    texto += '<div class="form-check"><input type="checkbox" '+check+'  name="permissions[]" value="'+ permission.id +'" class="name" > ' + permission.name + '</div>';
-                });
+                        texto += '<div class="form-check"><input type="checkbox" ' + check + ' name="permissions[]" value="' + permission.id + '" class="edit-permiso-check"> ' + permission.name + '</div>';                });
 
                 checkboxesContainer.append(texto);
+                actualizarSeleccionTodosEditar();
                 $('#updateModal').modal('show'); 
             }
         },error: function (jqXHR, estado, error){
@@ -93,6 +93,21 @@ function roleUpdate() {
 
         }
     })                       
+}
+
+$(document).on('change', '#edit_seleccionar_todos_permisos', function () {
+    $('.edit-permiso-check').prop('checked', $(this).is(':checked'));
+});
+
+$(document).on('change', '.edit-permiso-check', function () {
+    actualizarSeleccionTodosEditar();
+});
+
+function actualizarSeleccionTodosEditar() {
+    let total = $('.edit-permiso-check').length;
+    let marcados = $('.edit-permiso-check:checked').length;
+
+    $('#edit_seleccionar_todos_permisos').prop('checked', total > 0 && total === marcados);
 }
 
 

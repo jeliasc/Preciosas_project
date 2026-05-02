@@ -17,144 +17,190 @@ class CategoriasController extends Controller
         $this->middleware('auth');
     }
     
-    public function index(){
+    public function index()
+    {
         if (Auth::user()->can('ver categorias')) {
             try {
-                $categorias = Categoria::all();
+                $categorias = Categoria::orderBy('id', 'desc')->get();
+
                 return view('categorias.index', compact('categorias'));            
             } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error. '' . $th->getMessage();
-                Session::flash('eAuth', $error);
+                Session::flash('eAuth', 'Error ' . $th->getMessage());
                 return redirect('home');
             }
-        }else{
-            Session::flash('eAuth', 'Error, permiso denegado');
-            return redirect('home');
+        }
+
+        Session::flash('eAuth', 'Error, permiso denegado');
+        return redirect('home');
+    }
+
+    public function store(CategoriasRequest $request)
+    {
+        if (!Auth::user()->can('crear categorias')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
+        }
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $datos = $request->except('_token');
+
+            if (empty($datos['nombre'])) {
+                throw new \Exception('Debe ingresar el nombre de la categoría');
+            }
+
+            Categoria::create([
+                'nombre' => $datos['nombre'],
+                'estado_id' => 1
+            ]);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Categoría creada con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage()
+            ]);
         }
     }
 
-    public function store(CategoriasRequest $request){
-        if(Auth::user()->can('crear categorias',)){
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $mensaje = '';
-                $error = true;
-                $entrada = $request->all();
-                unset($entrada['_token']);
+    public function edit(Request $request, $id)
+    {
+        $categoria = null;
 
-                if(empty($request)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo crear la categoría';
-                }else{
-                    Categoria::create(['nombre'=>$request->input('nombre')]);
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Categoría creada con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+        if (!Auth::user()->can('editar categorias')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado',
+                'categoria' => $categoria
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        try {
+            $categoria = Categoria::where('id', $id)->first();
+
+            if (empty($categoria)) {
+                return Response::json([
+                    'error' => true,
+                    'mensaje' => 'Categoría no existe',
+                    'categoria' => null
+                ]);
+            }
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Consulta exitosa',
+                'categoria' => $categoria
+            ]);
+
+        } catch (\Throwable $th) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage(),
+                'categoria' => null
+            ]);
+        }
     }
 
-    public function edit(Request $request, $id){
-        if(Auth::user()->can('editar categorias')){
-            try {
-                $mensaje = '';
-                $error = true;
-                $categoria = Categoria::where('id', $id)->first(); 
-
-                if(empty($categoria)){
-                    $error = true;
-                    $mensaje = 'Categoría no existe';
-                }else{
-                    $error = false;
-                    $mensaje ='Consulta exitosa';
-                }
-
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function update(CategoriasRequest $request, $id)
+    {
+        if (!Auth::user()->can('editar categorias')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'categoria' => $categoria));
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $categoria = Categoria::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($categoria)) {
+                throw new \Exception('Categoría no existe');
+            }
+
+            $datos = $request->except(['_token', 'id']);
+
+            if (empty($datos['nombre'])) {
+                throw new \Exception('Debe ingresar el nombre de la categoría');
+            }
+
+            $categoria->update($datos);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Categoría actualizada con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage()
+            ]);
+        }
     }
 
-    public function update(CategoriasRequest $request, $id){
-        if(Auth::user()->can('editar categorias',)){
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $categoria=Categoria::find($id);
-                $mensaje = '';
-                $error = true;
-                $entrada = $request->all();
-                unset($entrada['id']);
-                unset($entrada['_token']);
-
-                if(empty($request)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo editar la categoría';
-                }else{
-                    $categoria->update($entrada);                  
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Categoría actualizado con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function destroy($id)
+    {
+        if (!Auth::user()->can('eliminar categorias')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
-    }
 
-    public function destroy($id){
-        if (auth::user()->can('eliminar categorias')) {
+        DB::connection('mysql')->beginTransaction();
 
-                DB::connection('mysql')->beginTransaction();
-            try 
-            {
-                $mensaje = '';
-                $error = true;
-                $categoria = Categoria::where('id', $id)->first();
-                
-                if(empty($categoria)){
-                    $error = true;
-                    $mensaje = 'Categoría no existe';
-                }else if($categoria->estado_id ==1){
-                    $error = false;
-                    $categoria->estado_id = 2;
-                    $mensaje ='Categoría deshabilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $categoria->save();
-                } else{
-                    $error = false;
-                    $categoria->estado_id = 1;
-                    $mensaje ='Categoría habilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $categoria->save();
-                }
-            }catch(\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();  
+        try {
+            $categoria = Categoria::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($categoria)) {
+                throw new \Exception('Categoría no existe');
             }
-        }else
-            {
-                $error = true;
-                $mensaje = 'Permiso denegado'; 
+
+            if ($categoria->estado_id == 1) {
+                $categoria->estado_id = 2;
+                $mensaje = 'Categoría deshabilitada con éxito';
+            } else {
+                $categoria->estado_id = 1;
+                $mensaje = 'Categoría habilitada con éxito';
             }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+            $categoria->save();
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => $mensaje
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage()
+            ]);
+        }
     }
 }

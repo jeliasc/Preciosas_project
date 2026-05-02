@@ -25,7 +25,10 @@ class VentasController extends Controller
 
     public function index()
     {
-        $ventas = Venta::where('estado_id', '3')->get();
+        $ventas = Venta::where('estado_id', '3')
+        ->orderBy('fecha', 'desc')
+        ->get();
+
         if (Auth::user()->can('ver ventas')) {
             try {
                 return view('ventas.index', compact('ventas'));
@@ -43,7 +46,10 @@ class VentasController extends Controller
 
     public function ventasAnuladas()
     {
-        $ventas = Venta::where('estado_id', '4')->get();
+        $ventas = Venta::where('estado_id', '4')
+        ->orderBy('fecha', 'desc')
+        ->get();
+        
         if (Auth::user()->can('ver ventas')) {
             try {
                 return view('ventas.ventasAnuladas', compact('ventas'));
@@ -86,96 +92,167 @@ class VentasController extends Controller
         }
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $mensaje = '';
         $error = true;
-        $entrada = $request->all();
-        unset($request['_token']);
-        if (Auth::user()->can('crear ventas')) {
-            DB::connection('mysql')->beginTransaction();
-            try {
-                if (empty($entrada)) {
-                    $error = true;
-                    $mensaje = 'Error, no se pudo crear la compra';
-                } else {
 
-                    $correlativo = Correlativo::pluck('ultimo_numero')->first();
-
-                    $correlativo_anterior = $correlativo;
-                    $nuevo_correlativo = $correlativo_anterior + 1;
-                    $numero_factura = $nuevo_correlativo;
-
-                    $venta = Venta::create($request->all() + [
-                        'user_id' => Auth::user()->id,
-                        'fecha' => Carbon::now('America/Guatemala'),
-                        'numero_factura' => $numero_factura,
-                    ]);
-
-                    foreach ($request->producto_id as $key => $p) {
-                        $resultado[] = array(
-                            'producto_id' => $request->producto_id[$key],
-                            "cantidad" => $request->cantidad[$key],
-                            "precio" => $request->precio[$key],
-                            "descuento" => $request->descuento[$key],
-                            "comentario" => $request->comentario[$key],
-                            "extra" => $request->extra[$key]
-                        );
-                    }
-                    $venta->detalleVentas()->createMany($resultado);
-
-                    $c = Correlativo::where('id', '1')->first();
-                    $c->ultimo_numero = $nuevo_correlativo;
-                    $c->save();
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje = 'Venta creada con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = 'Error ';
-                $error = $error . '' . $th->getMessage();
-                DB::connection('mysql')->rollBack();
-                $error = true;
-                $mensaje = 'Error ' . $th->getMessage();
-            }
-        } else {
-            $error = true;
-            $mensaje = 'Permiso denegado';
+        if (!Auth::user()->can('crear ventas')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        $datos = $request->except('_token');
+
+        DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            if (empty($datos)) {
+                throw new \Exception('No se pudo crear la venta');
+            }
+
+            if (empty($request->producto_id) || !is_array($request->producto_id)) {
+                throw new \Exception('Debe agregar al menos un producto a la venta');
+            }
+
+            if (empty($request->cliente_id)) {
+                throw new \Exception('Debe seleccionar un cliente para registrar la venta');
+            }
+
+            /*
+            * Bloqueo del correlativo.
+            * Evita que dos usuarios generen el mismo número de factura.
+            */
+            $correlativo = Correlativo::where('id', 1)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$correlativo) {
+                throw new \Exception('No existe correlativo configurado');
+            }
+
+            $nuevo_correlativo = $correlativo->ultimo_numero + 1;
+            $numero_factura = $nuevo_correlativo;
+
+            /*
+            * Validación de stock con bloqueo por producto.
+            * Esto evita problemas por ventas simultáneas.
+            */
+            foreach ($request->producto_id as $key => $productoId) {
+                $producto = DB::table('productos')
+                    ->where('id', $productoId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$producto) {
+                    throw new \Exception('Producto no encontrado');
+                }
+
+                $cantidadSolicitada = (int) $request->cantidad[$key];
+
+                if ($cantidadSolicitada <= 0) {
+                    throw new \Exception('La cantidad debe ser mayor a cero');
+                }
+
+                if ($producto->stock < $cantidadSolicitada) {
+                    throw new \Exception('Stock insuficiente para el producto: ' . $producto->nombre);
+                }
+            }
+
+            $venta = Venta::create($datos + [
+                'user_id' => Auth::user()->id,
+                'fecha' => Carbon::now('America/Guatemala'),
+                'numero_factura' => $numero_factura,
+            ]);
+
+            $resultado = [];
+
+            foreach ($request->producto_id as $key => $p) {
+                $resultado[] = [
+                    'producto_id' => $request->producto_id[$key],
+                    'cantidad' => $request->cantidad[$key],
+                    'precio' => $request->precio[$key],
+                    'descuento' => $request->descuento[$key],
+                    'comentario' => $request->comentario[$key],
+                    'extra' => $request->extra[$key],
+                ];
+            }
+
+            /*
+            * Al insertar detalle_ventas, tu trigger actual descuenta el stock.
+            */
+            $venta->detalleVentas()->createMany($resultado);
+
+            $correlativo->ultimo_numero = $nuevo_correlativo;
+            $correlativo->save();
+
+            DB::connection('mysql')->commit();
+
+            $error = false;
+            $mensaje = 'Venta creada con éxito';
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+            $error = true;
+            $mensaje = 'No se pudo registrar la venta. Verifique los datos ingresados.';
+        }
+
+        return Response::json([
+            'error' => $error,
+            'mensaje' => $mensaje
+        ]);
     }
 
     public function destroy($id)
     {
-        if (auth::user()->can('eliminar ventas')) {
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $mensaje = '';
-                $error = true;
-                $venta = Venta::where('id', $id)->first();
+        $mensaje = '';
+        $error = true;
 
-                if (empty($venta)) {
-                    $error = true;
-                    $mensaje = 'La venta no existe';
-                } else if ($venta->estado_id == 3) {
-                    $error = false;
-                    $venta->estado_id = 4;
-                    $mensaje = 'Venta anulada con éxito';
-                    DB::connection('mysql')->commit();
-                    $venta->save();
-                } else {
-                    $error = true;
-                    $mensaje = 'La venta esta anulada';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error ' . $th->getMessage();
-            }
-        } else {
-            $error = true;
-            $mensaje = 'Permiso denegado';
+        if (!Auth::user()->can('eliminar ventas')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $venta = Venta::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($venta)) {
+                throw new \Exception('La venta no existe');
+            }
+
+            if ($venta->estado_id != 3) {
+                throw new \Exception('La venta ya está anulada');
+            }
+
+            $venta->estado_id = 4;
+            $venta->save();
+
+            DB::connection('mysql')->commit();
+
+            $error = false;
+            $mensaje = 'Venta anulada con éxito';
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            $error = true;
+            $mensaje = 'Error ' . $th->getMessage();
+        }
+
+        return Response::json([
+            'error' => $error,
+            'mensaje' => $mensaje
+        ]);
     }
 
     public function detalleVenta($id)

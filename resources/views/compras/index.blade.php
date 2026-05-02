@@ -34,7 +34,9 @@
                         <td>{{$compra->id}}</td>
                         <td>{{$compra->user->name}}</td>
                         <td>{{$compra->proveedor->nombre}}</td>
-                        <td>{{date("d/m/Y H:i:s", strtotime($compra->fecha))}}</td>
+                        <td data-order="{{ $compra->fecha }}">
+                            {{ date("d/m/Y H:i:s", strtotime($compra->fecha)) }}
+                        </td>
                         <td>{{$compra->tax}}</td>
                         <td>{{$compra->total}}</td>
                         <td>{{$compra->estado->nombre}}</td>

@@ -1,38 +1,41 @@
 function ventaDelete(id) {
-    $.ajax({
-        type: "get",
-        dataType: "json",
-        url: "eliminarVenta/"+id,
-        data: {id},
 
-        success: function (response) {
-            if(response.error){
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: response.mensaje,
-                    footer: ''
-                  });   
+    Swal.fire({
+        title: '¿Anular venta?',
+        text: 'Esta acción anulará la venta y devolverá el stock.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, anular',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6'
+    }).then((result) => {
 
-            }else{
-                Swal.fire({
-                    icon: 'success',
-                    title: response.mensaje,
-                    showDenyButton: false,
-                    showCancelButton: false,
-                    confirmButtonText: 'Ok',
-                    allowOutsideClick: false,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    } else if (result.isDenied) {
-                        location.reload();
+        if (result.isConfirmed) {
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "eliminarVenta/" + id,
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+
+                success: function (response) {
+                    if (response.error) {
+                        Swal.fire('Error', response.mensaje, 'error');
+                    } else {
+                        Swal.fire('Venta anulada', response.mensaje, 'success')
+                            .then(() => location.reload());
                     }
-                })
-            }
-        },error: function (jqXHR, estado, error){
-            console.log(estado);
-            console.log(error);
+                },
+
+                error: function () {
+                    Swal.fire('Error', 'No se pudo anular la venta', 'error');
+                }
+            });
         }
-    })   
+    });
+
+    return false;
 }

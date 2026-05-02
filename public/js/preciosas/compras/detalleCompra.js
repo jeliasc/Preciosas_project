@@ -1,3 +1,4 @@
+/*
 function detalleCompra(id) {  
     $.ajax({
         url: "detalleCompra/"+id,
@@ -12,4 +13,4 @@ function detalleCompra(id) {
             console.log(error);        }
     });
     
-}
+} */

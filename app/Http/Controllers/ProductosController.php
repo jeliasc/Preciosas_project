@@ -13,260 +13,321 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 
-class ProductosController extends Controller{
+class ProductosController extends Controller
+{
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    public function index(){
-        if (Auth::user()->can('ver articulos')) {
-            try {
-                $productos = Producto::all();
-                return view('productos.index', compact('productos'));
-            } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error. '' . $th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
-            }
-        }else{
+    public function index()
+    {
+        if (!Auth::user()->can('ver articulos')) {
             Session::flash('eAuth', 'Error, Permiso denegado.');
+            return redirect('home');
+        }
+
+        try {
+            $productos = Producto::orderBy('id', 'desc')->get();
+            return view('productos.index', compact('productos'));
+        } catch (\Throwable $th) {
+            Session::flash('eAuth', 'Error ' . $th->getMessage());
             return redirect('home');
         }
     }
 
-    public function create(){
-        if(Auth::user()->can('crear articulos')){
-            try {
-                $mensaje = '';
-                $error = true;
-                $categorias = Categoria::all();
-                $proveedores = Proveedor::all();
+    public function create()
+    {
+        $categorias = [];
+        $proveedores = [];
 
-                if(empty($categorias)){
-                    $error = true;
-                    $mensaje = 'Categorías vacío';
-                }elseif(empty($proveedores)){
-                    $error = true;
-                    $mensaje = 'Proveedores vacío';
-                }else{
-                    $error = false;
-                    $mensaje ='Consulta exitosa';
-                }
-                
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+        if (!Auth::user()->can('crear articulos')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado',
+                'categorias' => $categorias,
+                'proveedores' => $proveedores
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'categorias' => $categorias, 'proveedores' => $proveedores));
+
+        try {
+            $categorias = Categoria::where('estado_id', 1)->orderBy('nombre', 'asc')->get();
+            $proveedores = Proveedor::where('estado_id', 1)->orderBy('nombre', 'asc')->get();
+
+            if ($categorias->isEmpty()) {
+                throw new \Exception('Categorías vacío');
+            }
+
+            if ($proveedores->isEmpty()) {
+                throw new \Exception('Proveedores vacío');
+            }
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Consulta exitosa',
+                'categorias' => $categorias,
+                'proveedores' => $proveedores
+            ]);
+
+        } catch (\Throwable $th) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage(),
+                'categorias' => $categorias,
+                'proveedores' => $proveedores
+            ]);
+        }
     }
 
-    public function store(ProductosRequest $request){
-        $mensaje = '';
-        $error = true;
-        $entrada = $request->all();
-        $tipo_imagen = $_FILES['foto_id']['type'];
-        $tamagno_imagen = $_FILES['foto_id']['size'];
-        unset($entrada['_token']);
-
-        if(Auth::user()->can('crear articulos',)){
-            DB::connection('mysql')->beginTransaction();
-            try { 
-                if(empty($entrada)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo crear el producto';
-                }else{
-                    if($archivo=$request->file('foto_id' )){
-                           if($tamagno_imagen <= 1000000){
-                            if($tipo_imagen == "image/jpg" || $tipo_imagen == "image/jpeg" || $tipo_imagen == "image/png" || $tipo_imagen == "image/gif"){
-                                $nombre=$archivo->getClientOriginalName();
-                                $archivo->move('images', $nombre);
-
-                                $foto = Foto::select('p.foto_id as id_foto', 'fotos.ruta as ruta_foto')
-                                ->join('productos as p', 'p.foto_id', 'fotos.id')
-                                ->where ('fotos.ruta', $nombre)
-                                ->get()
-                                ->first();
-
-                                if($foto){
-                                    $entrada['foto_id']=$foto->id_foto; 
-                                }else{
-                                    $foto=Foto::create(['ruta'=>$nombre]);
-                                    $entrada['foto_id']=$foto->id; 
-                                } 
-                            }else{
-                                Producto::create($entrada);
-                                DB::connection('mysql')->commit();
-                                $error = true;
-                                $mensaje ='La imagen debe tener un fomato jpg/jpeg/png/gif';
-                            }
-                        }else{
-                            Producto::create($entrada);
-                            DB::connection('mysql')->commit();
-                            $error = true;
-                            $mensaje ='La imagen debe tener un tamaño menor a 1Mb';
-                        }  
-                    }
-                    Producto::create($entrada);
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Producto creado con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function store(ProductosRequest $request)
+    {
+        if (!Auth::user()->can('crear articulos')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $entrada = $request->except('_token');
+
+            if (empty($entrada)) {
+                throw new \Exception('No se pudo crear el producto');
+            }
+
+            if ($request->hasFile('foto_id')) {
+                $archivo = $request->file('foto_id');
+
+                if ($archivo->getSize() > 1000000) {
+                    throw new \Exception('La imagen debe tener un tamaño menor a 1Mb');
+                }
+
+                $formatosPermitidos = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'];
+
+                if (!in_array($archivo->getMimeType(), $formatosPermitidos)) {
+                    throw new \Exception('La imagen debe tener formato jpg/jpeg/png/gif');
+                }
+
+                $nombre = $archivo->getClientOriginalName();
+                $archivo->move('images', $nombre);
+
+                $foto = Foto::where('ruta', $nombre)->first();
+
+                if (!$foto) {
+                    $foto = Foto::create([
+                        'ruta' => $nombre
+                    ]);
+                }
+
+                $entrada['foto_id'] = $foto->id;
+            }
+
+            Producto::create($entrada);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Producto creado con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+
+            DB::connection('mysql')->rollBack();
+
+            $mensaje = $th->getMessage();
+
+            if (str_contains($mensaje, 'Duplicate entry') && str_contains($mensaje, 'code')) {
+                $mensaje = 'El código del producto ya existe';
+            } else {
+                $mensaje = 'Error al guardar el producto';
+            }
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => $mensaje
+            ]);
+        }
     }
 
-    public function edit(Request $request, $id){
-        if(Auth::user()->can('editar articulos')){
-            try {
-                $mensaje = '';
-                $error = true;
-                $producto = Producto::where('id', $id)->first();     
-                $categorias = Categoria::all();
-                $proveedores = Proveedor::all();
+    public function edit(Request $request, $id)
+    {
+        $producto = null;
+        $categorias = [];
+        $proveedores = [];
+        $foto = null;
 
-                $foto = Foto::select('p.foto_id as id_foto', 'fotos.ruta as ruta_foto')
-                ->join('productos as p', 'p.foto_id', 'fotos.id')
-                ->where ('fotos.id', $producto->foto_id)
-                ->get()
+        if (!Auth::user()->can('editar articulos')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado',
+                'categorias' => $categorias,
+                'proveedores' => $proveedores,
+                'producto' => $producto,
+                'foto' => $foto
+            ]);
+        }
+
+        try {
+            $producto = Producto::where('id', $id)->first();
+
+            if (!$producto) {
+                throw new \Exception('Producto no existe');
+            }
+
+            $categorias = Categoria::where('estado_id', 1)->orderBy('nombre', 'asc')->get();
+            $proveedores = Proveedor::where('estado_id', 1)->orderBy('nombre', 'asc')->get();
+
+            if ($producto->foto_id) {
+                $foto = Foto::where('id', $producto->foto_id)->first();
+            }
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Consulta exitosa',
+                'categorias' => $categorias,
+                'proveedores' => $proveedores,
+                'producto' => $producto,
+                'foto' => $foto
+            ]);
+
+        } catch (\Throwable $th) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage(),
+                'categorias' => $categorias,
+                'proveedores' => $proveedores,
+                'producto' => $producto,
+                'foto' => $foto
+            ]);
+        }
+    }
+
+    public function update(ProductosRequest $request, $id)
+    {
+        if (!Auth::user()->can('editar articulos')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
+        }
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $producto = Producto::where('id', $id)
+                ->lockForUpdate()
                 ->first();
 
-                if(empty($producto)){
-                    $error = true;
-                    $mensaje = 'Producto vacío';
-                }elseif(empty($categorias)){
-                    $error = true;
-                    $mensaje = 'Categorías vacío';
-                }elseif(empty($proveedores)){
-                    $error = true;
-                    $mensaje = 'Proveedores vacío';
-                }else{
-                    $error = false;
-                    $mensaje ='Consulta exitosa';
+            if (!$producto) {
+                throw new \Exception('Producto no existe');
+            }
+
+            $entrada = $request->except(['_token', 'id']);
+
+            if (empty($entrada)) {
+                throw new \Exception('No se pudo editar el producto');
+            }
+
+            if ($request->hasFile('foto_id')) {
+                $archivo = $request->file('foto_id');
+
+                if ($archivo->getSize() > 1000000) {
+                    throw new \Exception('La imagen debe tener un tamaño menor a 1Mb');
                 }
 
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
+                $formatosPermitidos = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'];
+
+                if (!in_array($archivo->getMimeType(), $formatosPermitidos)) {
+                    throw new \Exception('La imagen debe tener formato jpg/jpeg/png/gif');
+                }
+
+                $nombre = $archivo->getClientOriginalName();
+                $archivo->move('images', $nombre);
+
+                $foto = Foto::where('ruta', $nombre)->first();
+
+                if (!$foto) {
+                    $foto = Foto::create([
+                        'ruta' => $nombre
+                    ]);
+                }
+
+                $entrada['foto_id'] = $foto->id;
             }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+
+            $producto->update($entrada);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Producto actualizado con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+            $mensaje = $th->getMessage();
+
+            if (str_contains($mensaje, 'Duplicate entry') && str_contains($mensaje, 'code')) {
+                $mensaje = 'El código del producto ya existe';
+            } else {
+                $mensaje = 'Error al guardar el producto';
+            }
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => $mensaje
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'categorias' => $categorias, 'proveedores' => $proveedores, 'producto' => $producto, 'foto' => $foto));
     }
 
-    public function update(ProductosRequest $request, $id){
-        $producto=Producto::find($id);
-        $entrada=$request->all();
-        unset($entrada['id']);
-        unset($entrada['_token']);
-        $mensaje = '';
-        $error = true;
-        
-        if(Auth::user()->can('editar articulos',)){
-            DB::connection('mysql')->beginTransaction();
-            try {
-                if(empty($request)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo editar el producto';
-                }else{
-                    if($archivo=$request->file('foto_id' )){
-                        $tipo_imagen = $_FILES['foto_id']['type'];
-                        $tamagno_imagen = $_FILES['foto_id']['size'];
-                        if($tamagno_imagen <= 1000000){
-                            if($tipo_imagen == "image/jpg" || $tipo_imagen == "image/jpeg" || $tipo_imagen == "image/png" || $tipo_imagen == "image/gif"){
-                                $nombre=$archivo->getClientOriginalName();
-                                $archivo->move('images', $nombre);
-                                $foto = Foto::select('p.foto_id as id_foto', 'fotos.ruta as ruta_foto')
-                                ->join('productos as p', 'p.foto_id', 'fotos.id')
-                                ->where ('fotos.ruta', $nombre)
-                                ->get()
-                                ->first();
-
-                                if($foto){
-                                    $entrada['foto_id']=$foto->id_foto; 
-                                }else{
-                                    $foto=Foto::create(['ruta'=>$nombre]);
-                                    $entrada['foto_id']=$foto->id; 
-                                }
-                            }else{
-                                $producto->update($entrada);                  
-                                DB::connection('mysql')->commit();
-                                $error = true;
-                                $mensaje ='La imagen debe tener un fomato jpg/jpeg/png/gif';
-                            }
-                        }else{
-                            $producto->update($entrada);                  
-                            DB::connection('mysql')->commit();
-                            $error = true;
-                            $mensaje ='La imagen debe tener un tamaño menor a 1Mb';
-                        }  
-                    }
-                    $producto->update($entrada);                  
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Producto actualizado con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function destroy($id)
+    {
+        if (!Auth::user()->can('eliminar articulos')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
-    }
 
-    public function destroy($id){
-        if (auth::user()->can('eliminar articulos')) {
+        DB::connection('mysql')->beginTransaction();
 
-                DB::connection('mysql')->beginTransaction();
-            try 
-            {
-                $mensaje = '';
-                $error = true;
-                $producto = Producto::where('id', $id)->first();
-                
-                if(empty($producto)){
-                    $error = true;
-                    $mensaje = 'El producto no existe';
-                }else if($producto->estado_id ==1){
-                    $error = false;
-                    $producto->estado_id = 2;
-                    $mensaje ='Producto deshabilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $producto->save();
-                } else{
-                    $error = false;
-                    $producto->estado_id = 1;
-                    $mensaje ='Producto habilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $producto->save();
-                }
-            }catch(\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();  
+        try {
+            $producto = Producto::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$producto) {
+                throw new \Exception('El producto no existe');
             }
-        }else
-            {
-                $error = true;
-                $mensaje = 'Permiso denegado'; 
+
+            if ($producto->estado_id == 1) {
+                $producto->estado_id = 2;
+                $mensaje = 'Producto deshabilitado con éxito';
+            } else {
+                $producto->estado_id = 1;
+                $mensaje = 'Producto habilitado con éxito';
             }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+            $producto->save();
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => $mensaje
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage()
+            ]);
+        }
     }
 }
-

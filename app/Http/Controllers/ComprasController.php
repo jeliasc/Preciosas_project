@@ -24,7 +24,9 @@ class ComprasController extends Controller
     {
         if (Auth::user()->can('ver compras')) {
             try {
-                $compras = Compra::where('estado_id', '3')->get();
+                $compras = Compra::where('estado_id', '3')
+                ->orderBy('fecha', 'desc')
+                ->get();
                 return view('compras.index', compact('compras'));
             } catch (\Throwable $th) {
                 $error = 'Error';
@@ -41,8 +43,9 @@ class ComprasController extends Controller
     {
         if (Auth::user()->can('ver compras')) {
             try {
-                $compras = Compra::where('estado_id', '4')->get();
-                return view('compras.comprasAnuladas', compact('compras'));
+                $compras = Compra::where('estado_id', '4')
+                ->orderBy('fecha', 'desc')
+                ->get();                return view('compras.comprasAnuladas', compact('compras'));
             } catch (\Throwable $th) {
                 $error = 'Error';
                 $error = $error . '' . $th->getMessage();
@@ -89,77 +92,155 @@ class ComprasController extends Controller
     {
         $mensaje = '';
         $error = true;
-        $entrada = $request->all();
+
+        if (!Auth::user()->can('crear compras')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
+        }
+
+        $datos = $request->except('_token');
         $no_fact = $request->input('no_fac');
 
-        unset($request['_token']);
+        DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+        DB::connection('mysql')->beginTransaction();
 
-        if (Auth::user()->can('crear compras',)) {
-            DB::connection('mysql')->beginTransaction();
-            try {
-                if (empty($entrada)) {
-                    $error = true;
-                    $mensaje = 'Error, no se pudo crear la compra';
-                } else {
-                    $compra = Compra::create($request->all() + [
-                        'user_id' => Auth::user()->id,
-                        'fecha' => Carbon::now('America/Guatemala'),
-                        'no_factura' => $no_fact,
-                    ]);
-                    foreach ($request->producto_id as $key => $producto) {
-                        $resultado[] = array(
-                            'producto_id' => $request->producto_id[$key],
-                            "cantidad" => $request->cantidad[$key], "precio" => $request->precio[$key]
-                        );
-                    }
-                    $compra->detalleCompras()->createMany($resultado);
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje = 'Compra creada con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error ' . $th->getMessage();
+        try {
+            if (empty($datos)) {
+                throw new \Exception('No se pudo crear la compra');
             }
-        } else {
+
+            if (empty($request->proveedor_id)) {
+                throw new \Exception('Debe seleccionar un proveedor');
+            }
+
+            if (empty($request->producto_id) || !is_array($request->producto_id)) {
+                throw new \Exception('Debe agregar al menos un producto a la compra');
+            }
+
+            foreach ($request->producto_id as $key => $productoId) {
+                $producto = DB::table('productos')
+                    ->where('id', $productoId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$producto) {
+                    throw new \Exception('Producto no encontrado');
+                }
+
+                $cantidad = (int) $request->cantidad[$key];
+                $precio = (float) $request->precio[$key];
+
+                if ($cantidad <= 0) {
+                    throw new \Exception('La cantidad debe ser mayor a cero');
+                }
+
+                if ($precio <= 0) {
+                    throw new \Exception('El precio debe ser mayor a cero');
+                }
+            }
+
+            $compra = Compra::create($datos + [
+                'user_id' => Auth::user()->id,
+                'fecha' => Carbon::now('America/Guatemala'),
+                'no_factura' => $no_fact,
+            ]);
+
+            $resultado = [];
+
+            foreach ($request->producto_id as $key => $producto) {
+                $resultado[] = [
+                    'producto_id' => $request->producto_id[$key],
+                    'cantidad' => $request->cantidad[$key],
+                    'precio' => $request->precio[$key],
+                ];
+            }
+
+            $compra->detalleCompras()->createMany($resultado);
+
+            DB::connection('mysql')->commit();
+
+            $error = false;
+            $mensaje = 'Compra creada con éxito';
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
             $error = true;
-            $mensaje = 'Permiso denegado';
+            $mensaje = 'Error ' . $th->getMessage();
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        return Response::json([
+            'error' => $error,
+            'mensaje' => $mensaje
+        ]);
     }
 
     public function destroy($id)
     {
-        if (auth::user()->can('eliminar compras')) {
+        $mensaje = '';
+        $error = true;
 
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $mensaje = '';
-                $error = true;
-                $compra = Compra::where('id', $id)->first();
-
-                if (empty($compra)) {
-                    $error = true;
-                    $mensaje = 'La compra no existe';
-                } else if ($compra->estado_id == 3) {
-                    $error = false;
-                    $compra->estado_id = 4;
-                    $mensaje = 'Compra anulada con éxito';
-                    DB::connection('mysql')->commit();
-                    $compra->save();
-                } else {
-                    $error = true;
-                    $mensaje = 'La compra esta anulada';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error ' . $th->getMessage();
-            }
-        } else {
-            $error = true;
-            $mensaje = 'Permiso denegado';
+        if (!Auth::user()->can('eliminar compras')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $compra = Compra::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($compra)) {
+                throw new \Exception('La compra no existe');
+            }
+
+            if ($compra->estado_id != 3) {
+                throw new \Exception('La compra ya está anulada');
+            }
+
+            foreach ($compra->detalleCompras as $detalle) {
+                $producto = DB::table('productos')
+                    ->where('id', $detalle->producto_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$producto) {
+                    throw new \Exception('Producto no encontrado');
+                }
+
+                if ($producto->stock < $detalle->cantidad) {
+                    throw new \Exception(
+                        'No se puede anular la compra. El producto "' . $producto->nombre . '" quedaría con stock negativo.'
+                    );
+                }
+            }
+
+            $compra->estado_id = 4;
+            $compra->save();
+
+            DB::connection('mysql')->commit();
+
+            $error = false;
+            $mensaje = 'Compra anulada con éxito';
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            $error = true;
+            $mensaje = 'Error ' . $th->getMessage();
+        }
+
+        return Response::json([
+            'error' => $error,
+            'mensaje' => $mensaje
+        ]);
     }
 
     public function detalleCompra($id)
@@ -183,7 +264,8 @@ class ComprasController extends Controller
 
     public function reportDay()
     {
-        $compras = Compra::whereDate('fecha', Carbon::today('America/Guatemala'))->where('estado_id', '3')->get();
+        $compras = Compra::whereDate('fecha', Carbon::today('America/Guatemala'))->where('estado_id', '3')->orderBy('fecha', 'desc')->get();
+            
         if (Auth::user()->can('ver reporte de ventas')) {
             try {
                 $total = $compras->sum('total');
@@ -202,7 +284,7 @@ class ComprasController extends Controller
 
     public function reportDate()
     {
-        $compras = Compra::where('estado_id', '3')->get();
+        $compras = Compra::where('estado_id', '3')->orderBy('fecha', 'desc')->get();
         if (Auth::user()->can('ver reporte de ventas')) {
             try {
                 $total = $compras->sum('total');

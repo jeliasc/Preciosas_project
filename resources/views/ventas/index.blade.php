@@ -37,7 +37,9 @@
                         <td>{{$venta->numero_factura}}</td>
                         <td>{{$venta->user->name}}</td>
                         <td>{{$venta->cliente->nombre}}</td>
-                        <td>{{date("d/m/Y H:i:s", strtotime($venta->fecha))}}</td>
+                        <td data-order="{{$venta->fecha}}">
+                            {{date("d/m/Y H:i:s", strtotime($venta->fecha))}}
+                        </td>
                         <td>{{$venta->total}}</td>
                         <td>{{$venta->estado->nombre}}</td>
                         <td>

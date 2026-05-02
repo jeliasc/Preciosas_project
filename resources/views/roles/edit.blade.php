@@ -30,8 +30,15 @@
                                     <tr>
                                         <td><label>Permisos</label></td>
                                         <td> 
+                                            <div class="mb-2">
+                                                <label>
+                                                    <input type="checkbox" id="edit_seleccionar_todos_permisos">
+                                                    Seleccionar todos
+                                                </label>
+                                            </div>
+
                                             <div id="edit_permisos_id">
-                                            </div>                        
+                                            </div>                       
                                             @error('name')
                                                 <small> 
                                                     <strong>{{$message}}</strong>

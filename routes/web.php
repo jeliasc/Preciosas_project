@@ -75,7 +75,7 @@ Route::get('comprasIndex', [ComprasController::class, 'index'])->name('comprasIn
 Route::get('comprasAnuladas',[ComprasController::class, 'comprasAnuladas'])->name('comprasAnuladas');
 Route::get('crearCompra', [ComprasController::class, 'create'])->name('crearCompra');
 Route::post('insertarCompra', [ComprasController::class, 'store'])->name('insertarCompra');
-Route::get('eliminarCompra/{id}',[ComprasController::class, 'destroy'])->name('eliminarCompra');
+Route::post('eliminarCompra/{id}',[ComprasController::class, 'destroy'])->name('eliminarCompra');
 Route::get('compra/reportDay',[ComprasController::class, 'reportDay'])->name('compra.reportDay');
 Route::get('compra/reportDate',[ComprasController::class, 'reportDate'])->name('compra.reportDate');
 Route::post('compra/reportResult',[ComprasController::class, 'reportResult'])->name('compra.reportResult');
@@ -88,7 +88,7 @@ Route::get('ventasAnuladas',[VentasController::class, 'ventasAnuladas'])->name('
 Route::get('crearVenta', [VentasController::class, 'create'])->name('crearVenta');
 Route::post('insertarVenta', [VentasController::class, 'store'])->name('insertarVenta');
 Route::get('detalleVenta/{id}',[VentasController::class, 'detalleVenta'])->name('detalleVenta');
-Route::get('eliminarVenta/{id}',[VentasController::class, 'destroy'])->name('eliminarVenta');
+Route::post('eliminarVenta/{id}',[VentasController::class, 'destroy'])->name('eliminarVenta');
 Route::get('venta/reportDay',[VentasController::class, 'reportDay'])->name('venta.reportDay');
 Route::get('venta/reportDate',[VentasController::class, 'reportDate'])->name('venta.reportDate');
 Route::post('venta/reportResult',[VentasController::class, 'reportResult'])->name('venta.reportResult');

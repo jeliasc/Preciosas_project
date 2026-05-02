@@ -1,38 +1,45 @@
 function compraDelete(id) {
-    $.ajax({
-        type: "get",
-        dataType: "json",
-        url: "eliminarCompra/"+id,
-        data: {id},
 
-        success: function (response) {
-            if(response.error){
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: response.mensaje,
-                    footer: ''
-                  });   
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta compra será anulada",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, anular',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
 
-            }else{
-                Swal.fire({
-                    icon: 'success',
-                    title: response.mensaje,
-                    showDenyButton: false,
-                    showCancelButton: false,
-                    confirmButtonText: 'Ok',
-                    allowOutsideClick: false,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.reload();
-                    } else if (result.isDenied) {
-                        location.reload();
+        if (result.isConfirmed) {
+
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "eliminarCompra/" + id,
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+
+                success: function (response) {
+                    if (response.error) {
+                        Swal.fire('Error', response.mensaje, 'error');
+                    } else {
+                        Swal.fire('Compra anulada', response.mensaje, 'success')
+                            .then(() => location.reload());
                     }
-                })
-            }
-        },error: function (jqXHR, estado, error){
-            console.log(estado);
-            console.log(error);
+                },
+
+                error: function (jqXHR) {
+                    console.log(jqXHR.responseText);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo anular la compra'
+                    });
+                }
+            });
         }
-    })   
+    });
 }

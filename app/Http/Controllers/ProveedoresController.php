@@ -17,141 +17,199 @@ class ProveedoresController extends Controller
         $this->middleware('auth');
     }
        
-    public function index(){
-        if(Auth::user()->can('ver proveedores')){
-            try {
-                $proveedores = Proveedor::all();
-                return view('proveedores.index', compact('proveedores'));
-            } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error.' '. $th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
-            }  
-        }else {
+    public function index()
+    {
+        if (!Auth::user()->can('ver proveedores')) {
             Session::flash('eAuth', 'Error, permiso denegado');
+            return redirect('home');
+        }
+
+        try {
+            $proveedores = Proveedor::orderBy('id', 'desc')->get();
+            return view('proveedores.index', compact('proveedores'));
+        } catch (\Throwable $th) {
+            Session::flash('eAuth', 'Error ' . $th->getMessage());
             return redirect('home');
         }
     }
 
-    public function store(ProveedoresRequest $request){
-        if(Auth::user()->can('crear proveedores',)){
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $mensaje = '';
-                $error = true;
-                $entrada = $request->all();
-                unset($entrada['_token']);
-
-                if(empty($request)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo crear el proveedor';
-                }else{
-                    Proveedor::create($entrada);
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Proveedor creado con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function store(ProveedoresRequest $request)
+    {
+        if (!Auth::user()->can('crear proveedores')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $entrada = $request->except('_token');
+
+            if (empty($entrada)) {
+                throw new \Exception('No se pudo crear el proveedor');
+            }
+
+            if (Proveedor::where('nit', $request->nit)->exists()) {
+                throw new \Exception('El NIT del proveedor ya existe. Ingrese uno diferente.');
+            }
+
+            Proveedor::create($entrada);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Proveedor creado con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => $th->getMessage()
+            ]);
+        }
     }
 
-    public function edit(Request $request, $id){
-        if(Auth::user()->can('editar proveedores')){
-            try {
-                $mensaje = '';
-                $error = true;
-                $proveedor = Proveedor::where('id', $id)->first();     
-                if(empty($proveedor)){
-                    $error = true;
-                    $mensaje = 'Proveedor no existe';
-                }else{
-                    $error = false;
-                    $mensaje ='Consulta exitosa';
-                }
+    public function edit(Request $request, $id)
+    {
+        $proveedor = null;
 
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+        if (!Auth::user()->can('editar proveedores')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado',
+                'proveedor' => $proveedor
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'proveedor' => $proveedor));
+
+        try {
+            $proveedor = Proveedor::where('id', $id)->first();
+
+            if (empty($proveedor)) {
+                return Response::json([
+                    'error' => true,
+                    'mensaje' => 'Proveedor no existe',
+                    'proveedor' => null
+                ]);
+            }
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Consulta exitosa',
+                'proveedor' => $proveedor
+            ]);
+
+        } catch (\Throwable $th) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage(),
+                'proveedor' => null
+            ]);
+        }
     }
 
-    public function update(ProveedoresRequest $request, $id){
-        if(Auth::user()->can('editar proveedores',)){
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $proveedor=Proveedor::find($id);
-                $mensaje = '';
-                $error = true;
-                $entrada = $request->all();
-                unset($entrada['id']);
-                unset($entrada['_token']);
-
-                if(empty($request)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo editar el proveedor';
-                }else{
-                    $proveedor->update($entrada);                  
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Proveedor actualizado con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function update(ProveedoresRequest $request, $id)
+    {
+        if (!Auth::user()->can('editar proveedores')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $proveedor = Proveedor::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($proveedor)) {
+                throw new \Exception('Proveedor no existe');
+            }
+
+            $entrada = $request->except(['_token', 'id']);
+
+            if (empty($entrada)) {
+                throw new \Exception('No se pudo editar el proveedor');
+            }
+
+            if (
+                isset($entrada['nit']) &&
+                Proveedor::where('nit', $entrada['nit'])
+                    ->where('id', '!=', $id)
+                    ->exists()
+            ) {
+                throw new \Exception('El NIT del proveedor ya existe. Ingrese uno diferente.');
+            }
+
+            $proveedor->update($entrada);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Proveedor actualizado con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => $th->getMessage()
+            ]);
+        }
     }
 
-    public function destroy($id){
-        if (auth::user()->can('eliminar proveedores')) {
-                DB::connection('mysql')->beginTransaction();
-            try 
-            {
-                $mensaje = '';
-                $error = true;
-                $proveedor = Proveedor::where('id', $id)->first();
-                
-                if(empty($proveedor)){
-                    $error = true;
-                    $mensaje = 'Proveedor no existe';
-                }else if($proveedor->estado_id ==1){
-                    $error = false;
-                    $proveedor->estado_id = 2;
-                    $mensaje ='Proveedor deshabilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $proveedor->save();
-                } else{
-                    $error = false;
-                    $proveedor->estado_id = 1;
-                    $mensaje ='Proveedor habilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $proveedor->save();
-                }
-            } catch(\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();  
+    public function destroy($id)
+    {
+        if (!Auth::user()->can('eliminar proveedores')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
+        }
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $proveedor = Proveedor::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($proveedor)) {
+                throw new \Exception('Proveedor no existe');
             }
-        }else{
-                $error = true;
-                $mensaje = 'Permiso denegado'; 
+
+            if ($proveedor->estado_id == 1) {
+                $proveedor->estado_id = 2;
+                $mensaje = 'Proveedor deshabilitado con éxito';
+            } else {
+                $proveedor->estado_id = 1;
+                $mensaje = 'Proveedor habilitado con éxito';
             }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+            $proveedor->save();
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => $mensaje
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage()
+            ]);
+        }
     }
 }

@@ -17,141 +17,200 @@ class ClientesController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
-        if (Auth::user()->can('ver clientes')) {
-            try {
-                $clientes = Cliente::all();
-                return view('clientes.index', compact('clientes'));
-            } catch (\Throwable $th) {
-                $error = 'Error';
-                $error = $error. '' . $th->getMessage();
-                Session::flash('eAuth', $error);
-                return redirect('home');
-            }
-        }else{
+    public function index()
+    {
+        if (!Auth::user()->can('ver clientes')) {
             Session::flash('eAuth', 'Error, Permiso denegado.');
+            return redirect('home');
+        }
+
+        try {
+            $clientes = Cliente::orderBy('id', 'desc')->get();
+            return view('clientes.index', compact('clientes'));
+        } catch (\Throwable $th) {
+            Session::flash('eAuth', 'Error ' . $th->getMessage());
             return redirect('home');
         }
     }
 
-    public function store(ClientesRequest $request){
-        if(Auth::user()->can('crear clientes',)){
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $mensaje = '';
-                $error = true;
-                $entrada = $request->all();
-                unset($entrada['_token']);
-
-                if(empty($request)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo crear el cliente';
-                }else{
-                    Cliente::create($entrada);
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Cliente creado con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function store(ClientesRequest $request)
+    {
+        if (!Auth::user()->can('crear clientes')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $datos = $request->except('_token');
+
+            if (empty($datos)) {
+                throw new \Exception('No se pudo crear el cliente');
+            }
+
+            if (Cliente::where('nit', $request->nit)->exists()) {
+                throw new \Exception('El NIT del cliente ya existe. Ingrese uno diferente.');
+            }
+            Cliente::create($datos);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Cliente creado con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+            $mensaje = $th->getMessage();
+  
+            return Response::json([
+                'error' => true,
+                'mensaje' => $mensaje
+            ]);
+        }
     }
 
-    public function edit(Request $request, $id){
-        if(Auth::user()->can('editar clientes')){
-            try {
-                $mensaje = '';
-                $error = true;
-                $cliente = Cliente::where('id', $id)->first();     
-                if(empty($cliente)){
-                    $error = true;
-                    $mensaje = 'Cliente no existe';
-                }else{
-                    $error = false;
-                    $mensaje ='Consulta exitosa';
-                }
+    public function edit(Request $request, $id)
+    {
+        $cliente = null;
 
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+        if (!Auth::user()->can('editar clientes')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado',
+                'cliente' => $cliente
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje, 'cliente' => $cliente));
+
+        try {
+            $cliente = Cliente::where('id', $id)->first();
+
+            if (empty($cliente)) {
+                return Response::json([
+                    'error' => true,
+                    'mensaje' => 'Cliente no existe',
+                    'cliente' => null
+                ]);
+            }
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Consulta exitosa',
+                'cliente' => $cliente
+            ]);
+
+        } catch (\Throwable $th) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage(),
+                'cliente' => null
+            ]);
+        }
     }
 
-    public function update(ClientesRequest $request, $id){
-        if(Auth::user()->can('editar clientes',)){
-            DB::connection('mysql')->beginTransaction();
-            try {
-                $cliente=Cliente::find($id);
-                $mensaje = '';
-                $error = true;
-                $entrada = $request->all();
-                unset($entrada['id']);
-                unset($entrada['_token']);
-
-                if(empty($request)){
-                    $error = true;
-                    $mensaje = 'Error, no se pudo editar el cliente';
-                }else{
-                    $cliente->update($entrada);                  
-                    DB::connection('mysql')->commit();
-                    $error = false;
-                    $mensaje ='Cliente actualizado con éxito';
-                }
-            } catch (\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();
-            }
-        }else{
-            $error = true;
-            $mensaje = 'Permiso denegado';
+    public function update(ClientesRequest $request, $id)
+    {
+        if (!Auth::user()->can('editar clientes')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
         }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $cliente = Cliente::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($cliente)) {
+                throw new \Exception('Cliente no existe');
+            }
+
+            $datos = $request->except(['_token', 'id']);
+
+            if (empty($datos)) {
+                throw new \Exception('No se pudo editar el cliente');
+            }
+
+            if (
+                isset($datos['nit']) &&
+                Cliente::where('nit', $datos['nit'])
+                    ->where('id', '!=', $id)
+                    ->exists()
+            ) {
+                throw new \Exception('El NIT del cliente ya existe. Ingrese uno diferente.');
+            }
+
+            $cliente->update($datos);
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Cliente actualizado con éxito'
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+            $mensaje = $th->getMessage();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => $mensaje
+            ]);
+        }
     }
 
-    public function destroy($id){
-        if (auth::user()->can('eliminar clientes')) {
-                DB::connection('mysql')->beginTransaction();
-            try 
-            {
-                $mensaje = '';
-                $error = true;
-                $cliente = Cliente::where('id', $id)->first();
-                
-                if(empty($cliente)){
-                    $error = true;
-                    $mensaje = 'Cliente no existe';
-                }else if($cliente->estado_id ==1){
-                    $error = false;
-                    $cliente->estado_id = 2;
-                    $mensaje ='Cliente deshabilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $cliente->save();
-                } else{
-                    $error = false;
-                    $cliente->estado_id = 1;
-                    $mensaje ='Cliente habilitado con éxito';
-                    DB::connection('mysql')->commit();
-                    $cliente->save();
-                }
-            } catch(\Throwable $th) {
-                $error = true;
-                $mensaje = 'Error '.$th->getMessage();  
+    public function destroy($id)
+    {
+        if (!Auth::user()->can('eliminar clientes')) {
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Permiso denegado'
+            ]);
+        }
+
+        DB::connection('mysql')->beginTransaction();
+
+        try {
+            $cliente = Cliente::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (empty($cliente)) {
+                throw new \Exception('Cliente no existe');
             }
-        }else{
-                $error = true;
-                $mensaje = 'Permiso denegado'; 
+
+            if ($cliente->estado_id == 1) {
+                $cliente->estado_id = 2;
+                $mensaje = 'Cliente deshabilitado con éxito';
+            } else {
+                $cliente->estado_id = 1;
+                $mensaje = 'Cliente habilitado con éxito';
             }
-        return Response::json(array('error' => $error, 'mensaje' => $mensaje));
+
+            $cliente->save();
+
+            DB::connection('mysql')->commit();
+
+            return Response::json([
+                'error' => false,
+                'mensaje' => $mensaje
+            ]);
+
+        } catch (\Throwable $th) {
+            DB::connection('mysql')->rollBack();
+
+            return Response::json([
+                'error' => true,
+                'mensaje' => 'Error ' . $th->getMessage()
+            ]);
+        }
     }
 }
