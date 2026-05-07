@@ -88,6 +88,7 @@ class ProductosController extends Controller
             ]);
         }
 
+        DB::statement('SET @app_user_id = ?', [Auth::id()]);
         DB::connection('mysql')->beginTransaction();
 
         try {
@@ -214,6 +215,7 @@ class ProductosController extends Controller
             ]);
         }
 
+        DB::statement('SET @app_user_id = ?', [Auth::id()]);
         DB::connection('mysql')->beginTransaction();
 
         try {
@@ -293,6 +295,7 @@ class ProductosController extends Controller
             ]);
         }
 
+        DB::statement('SET @app_user_id = ?', [Auth::id()]);
         DB::connection('mysql')->beginTransaction();
 
         try {

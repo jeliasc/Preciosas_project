@@ -107,6 +107,7 @@ class VentasController extends Controller
         $datos = $request->except('_token');
 
         DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+        DB::statement('SET @app_user_id = ?', [Auth::id()]);
         DB::connection('mysql')->beginTransaction();
 
         try {
@@ -219,6 +220,7 @@ class VentasController extends Controller
         }
 
         DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+        DB::statement('SET @app_user_id = ?', [Auth::id()]);
         DB::connection('mysql')->beginTransaction();
 
         try {
@@ -335,7 +337,7 @@ class VentasController extends Controller
     }
     public function pdf($id)
     {
-        $venta = Venta::findOrFail($id);
+        $venta = Venta::findOrFail($id)->where('estado_id', '3');
         if (Auth::user()->can('ver reporte de ventas')) {
             try {
                 $detalleVentas = $venta->detalleVentas;
@@ -354,7 +356,7 @@ class VentasController extends Controller
     }
     public function ReportePdf()
     {
-        $ventas = Venta::whereDate('fecha', Carbon::today('America/Guatemala'))->get();
+        $ventas = Venta::whereDate('fecha', Carbon::today('America/Guatemala'))->where('estado_id', '3')->get();
         if (Auth::user()->can('ver reporte de ventas')) {
             try {
                 $total = $ventas->sum('total');

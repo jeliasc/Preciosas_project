@@ -41,8 +41,8 @@
                         </td>
                         <td>{{$user->email}}</td>
                         <td>{{$user->estado->nombre}}</td>
-                        <td>{{$user->created_at}}</td>
-                        <td>{{$user->updated_at}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($user->created_at))}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($user->updated_at))}}</td>
                         <td>
                             <div class="row">
                                 <div class="col-md-6">

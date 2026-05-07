@@ -433,6 +433,13 @@ return [
             'can'  => 'ver usuarios',
         ],
         [
+            'text' => 'AUDITORÍA',
+            'route'  => 'auditoria.index',
+            'icon' => 'fas fa-clipboard-list',
+            'icon_color' => 'primary',
+            'can'  => 'ver auditoria',
+        ],
+        [
             'text' => 'profile',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-user',

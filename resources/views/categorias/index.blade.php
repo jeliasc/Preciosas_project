@@ -32,8 +32,8 @@
                         <td>{{$categoria->id}}</td>
                         <td>{{$categoria->nombre}}</td>
                         <td>{{$categoria->estado->nombre}}</td>
-                        <td>{{$categoria->created_at}}</td>
-                        <td>{{$categoria->updated_at}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($categoria->created_at))}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($categoria->updated_at))}}</td>
                         <td>
                             <div class="row">
                                 <div class="col-md-6">

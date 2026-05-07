@@ -32,8 +32,8 @@
                         <td>{{$role->id}}</td>
                         <td>{{$role->name}}</td>
                         <td>{{$role->estado->nombre}}</td>
-                        <td>{{$role->created_at}}</td>
-                        <td>{{$role->updated_at}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($role->created_at))}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($role->updated_at))}}</td>
                         <td>
                             <div class="row">
                                 <div class="col-md-6">

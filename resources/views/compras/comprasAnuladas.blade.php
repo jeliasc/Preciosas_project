@@ -2,6 +2,11 @@
 
 @section('title', 'Dashboard')
 
+@php
+    use Carbon\Carbon;
+    Carbon::setLocale('es');
+@endphp
+
 @section('content_header')
     <h1>Compras Anuladas</h1>
 @stop

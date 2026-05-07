@@ -2,6 +2,11 @@
 
 @section('title', 'Index_Compras')
 
+@php
+    use Carbon\Carbon;
+    Carbon::setLocale('es');
+@endphp
+
 @section('content_header')
     <h1>Compras</h1>
 @stop
@@ -35,7 +40,7 @@
                         <td>{{$compra->user->name}}</td>
                         <td>{{$compra->proveedor->nombre}}</td>
                         <td data-order="{{ $compra->fecha }}">
-                            {{ date("d/m/Y H:i:s", strtotime($compra->fecha)) }}
+                            {{ Carbon::parse($compra->fecha)->translatedFormat('d \\d\\e F Y H:i') }}
                         </td>
                         <td>{{$compra->tax}}</td>
                         <td>{{$compra->total}}</td>

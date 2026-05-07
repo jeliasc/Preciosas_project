@@ -50,8 +50,8 @@
                         <td>{{$producto->categoria->nombre}}</td>
                         <td>{{$producto->proveedor->nombre}}</td>
                         <td>{{$producto->estado->nombre}}</td>
-                        <td>{{$producto->created_at}}</td>
-                        <td>{{$producto->updated_at}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($producto->created_at))}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($producto->updated_at))}}</td>
                         <td>
                             <div class="row">
                                 <div class="col-md-6">

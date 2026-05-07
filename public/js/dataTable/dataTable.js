@@ -1,4 +1,4 @@
 $('#myTable').DataTable({
     responsive: true,
-    order: [[3, 'desc']]
+    order: [[5, 'desc']]
 });

@@ -9,6 +9,7 @@ use App\Http\Controllers\ProveedoresController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VentasController;
+use App\Http\Controllers\AuditoriaController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -95,6 +96,9 @@ Route::post('venta/reportResult',[VentasController::class, 'reportResult'])->nam
 Route::get('venta/pdf/{id}',[VentasController::class, 'pdf'])->name('venta.pdf');
 Route::get('ventas/ReportePdf',[VentasController::class, 'ReportePdf'])->name('ventas.ReportePdf');
 Route::get('venta/print/{id}',[VentasController::class, 'print'])->name('venta.print');
+
+Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index')->middleware('can:ver auditoria');
+Route::get('/auditoria/{id}', [AuditoriaController::class, 'show']);
 
 
 

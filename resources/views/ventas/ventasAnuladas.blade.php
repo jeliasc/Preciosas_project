@@ -1,6 +1,11 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', 'Ventas')
+
+@php
+    use Carbon\Carbon;
+    Carbon::setLocale('es');
+@endphp
 
 @section('content_header')
     <h1>Ventas Anuladas</h1>
@@ -38,8 +43,8 @@
                         <td>{{$venta->numero_factura}}</td>
                         <td>{{$venta->user->name}}</td>
                         <td>{{$venta->cliente->nombre}}</td>
-                        <td data-order="{{$venta->fecha}}">
-                            {{date("d/m/Y H:i:s", strtotime($venta->fecha))}}
+                        <td data-order="{{ $venta->fecha }}">
+                            {{ Carbon::parse($venta->fecha)->translatedFormat('d \\d\\e F Y H:i') }}
                         </td>
                         <td>{{$venta->total}}</td>
                         <td>{{$venta->estado->nombre}}</td>

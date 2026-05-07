@@ -40,8 +40,8 @@
                         <td>{{$proveedor->telefono}}</td>
                         <td>{{$proveedor->email}}</td>
                         <td>{{$proveedor->estado->nombre}}</td>
-                        <td>{{$proveedor->created_at}}</td>
-                        <td>{{$proveedor->updated_at}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($proveedor->created_at))}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($proveedor->updated_at))}}</td>
                         <td>
                             <div class="row">
                                 <div class="col-md-6">

@@ -104,6 +104,7 @@ class ComprasController extends Controller
         $no_fact = $request->input('no_fac');
 
         DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+        DB::statement('SET @app_user_id = ?', [Auth::id()]);
         DB::connection('mysql')->beginTransaction();
 
         try {
@@ -190,6 +191,7 @@ class ComprasController extends Controller
         }
 
         DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+        DB::statement('SET @app_user_id = ?', [Auth::id()]);
         DB::connection('mysql')->beginTransaction();
 
         try {

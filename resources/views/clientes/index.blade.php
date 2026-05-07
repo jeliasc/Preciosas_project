@@ -41,8 +41,8 @@
                         <td>{{$cliente->telefono}}</td>
                         <td>{{$cliente->email}}</td>
                         <td>{{$cliente->estado->nombre}}</td>
-                        <td>{{$cliente->created_at}}</td>
-                        <td>{{$cliente->updated_at}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($cliente->created_at))}}</td>
+                        <td>{{date("d/m/Y H:i:s", strtotime($cliente->updated_at))}}</td>
                         <td>
                             <div class="row">
                                 <div class="col-md-6">

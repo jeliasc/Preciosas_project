@@ -66,6 +66,11 @@ class UsersSeeders extends Seeder
         Permission::create(['name'=>'editar perfil'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'eliminar perfil'])->syncRoles([$superadminRole]);
         Permission::create(['name'=>'editar password'])->syncRoles([$superadminRole]);
+        
+        Permission::create(['name'=>'ver auditoria'])->syncRoles([$superadminRole]);
+
+
+        
 
 
         $user = new User();
