@@ -295,17 +295,24 @@ function compraInsert() {
             }
         },
 
-        error: function (jqXHR, estado, error) {
+        error: function (xhr, estado, error) {
+
             btn.prop("disabled", false);
             btn.text("Registrar");
 
             console.log(estado);
             console.log(error);
 
+            let mensaje = 'No se pudo registrar la compra.';
+
+            if (xhr.responseJSON && xhr.responseJSON.mensaje) {
+                mensaje = xhr.responseJSON.mensaje;
+            }
+
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'No se pudo registrar la compra.'
+                text: mensaje
             });
         }
     });

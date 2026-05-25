@@ -307,16 +307,22 @@ function ventaInsert() {
             }
         },
 
-        error: function () {
+        error: function (xhr) {
 
             // Reactiva botón si falla AJAX
             btn.prop("disabled", false);
             btn.text("Registrar");
 
+            let mensaje = 'Error en la comunicación con el servidor';
+
+            if (xhr.responseJSON && xhr.responseJSON.mensaje) {
+                mensaje = xhr.responseJSON.mensaje;
+            }
+
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Error en la comunicación con el servidor'
+                text: mensaje
             });
         }
     });

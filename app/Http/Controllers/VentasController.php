@@ -106,11 +106,11 @@ class VentasController extends Controller
 
         $datos = $request->except('_token');
 
-        DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
-        DB::statement('SET @app_user_id = ?', [Auth::id()]);
-        DB::connection('mysql')->beginTransaction();
-
         try {
+            DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+            DB::statement('SET @app_user_id = ?', [Auth::id()]);
+            DB::connection('mysql')->beginTransaction();
+
             if (empty($datos)) {
                 throw new \Exception('No se pudo crear la venta');
             }
@@ -123,25 +123,16 @@ class VentasController extends Controller
                 throw new \Exception('Debe seleccionar un cliente para registrar la venta');
             }
 
-            /*
-            * Bloqueo del correlativo.
-            * Evita que dos usuarios generen el mismo número de factura.
-            */
             $correlativo = Correlativo::where('id', 1)
                 ->lockForUpdate()
                 ->first();
 
             if (!$correlativo) {
-                throw new \Exception('No existe correlativo configurado');
+                throw new \Exception('No existe correlativo configurado para registrar la venta');
             }
 
             $nuevo_correlativo = $correlativo->ultimo_numero + 1;
-            $numero_factura = $nuevo_correlativo;
 
-            /*
-            * Validación de stock con bloqueo por producto.
-            * Esto evita problemas por ventas simultáneas.
-            */
             foreach ($request->producto_id as $key => $productoId) {
                 $producto = DB::table('productos')
                     ->where('id', $productoId)
@@ -166,7 +157,7 @@ class VentasController extends Controller
             $venta = Venta::create($datos + [
                 'user_id' => Auth::user()->id,
                 'fecha' => Carbon::now('America/Guatemala'),
-                'numero_factura' => $numero_factura,
+                'numero_factura' => $nuevo_correlativo,
             ]);
 
             $resultado = [];
@@ -182,9 +173,6 @@ class VentasController extends Controller
                 ];
             }
 
-            /*
-            * Al insertar detalle_ventas, tu trigger actual descuenta el stock.
-            */
             $venta->detalleVentas()->createMany($resultado);
 
             $correlativo->ultimo_numero = $nuevo_correlativo;
@@ -192,19 +180,37 @@ class VentasController extends Controller
 
             DB::connection('mysql')->commit();
 
-            $error = false;
-            $mensaje = 'Venta creada con éxito';
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Venta creada con éxito'
+            ]);
 
         } catch (\Throwable $th) {
             DB::connection('mysql')->rollBack();
-            $error = true;
-            $mensaje = 'No se pudo registrar la venta. Verifique los datos ingresados.';
-        }
 
-        return Response::json([
-            'error' => $error,
-            'mensaje' => $mensaje
-        ]);
+            DB::table('logs_errores_bd')->insert([
+                'fecha_hora' => now(),
+                'usuario_bd' => DB::selectOne('SELECT CURRENT_USER() AS usuario')->usuario,
+                'procedimiento' => 'VentasController@store',
+                'tabla_afectada' => 'ventas / detalle_ventas / correlativos / productos',
+                'accion' => 'INSERT',
+                'codigo_error' => $th->getCode(),
+                'mensaje_error' => $th->getMessage(),
+                'datos_referencia' => json_encode($request->all())
+            ]);
+
+            \Log::error('ERROR REAL AL REGISTRAR VENTA', [
+                'mensaje' => $th->getMessage(),
+                'codigo' => $th->getCode(),
+                'archivo' => $th->getFile(),
+                'linea' => $th->getLine()
+            ]);
+
+            return response()->json([
+                'error' => true,
+                'mensaje' => $th->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy($id)

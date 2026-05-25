@@ -103,11 +103,11 @@ class ComprasController extends Controller
         $datos = $request->except('_token');
         $no_fact = $request->input('no_fac');
 
-        DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
-        DB::statement('SET @app_user_id = ?', [Auth::id()]);
-        DB::connection('mysql')->beginTransaction();
-
         try {
+            DB::connection('mysql')->statement('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+            DB::statement('SET @app_user_id = ?', [Auth::id()]);
+            DB::connection('mysql')->beginTransaction();
+
             if (empty($datos)) {
                 throw new \Exception('No se pudo crear la compra');
             }
@@ -162,20 +162,37 @@ class ComprasController extends Controller
 
             DB::connection('mysql')->commit();
 
-            $error = false;
-            $mensaje = 'Compra creada con éxito';
+            return Response::json([
+                'error' => false,
+                'mensaje' => 'Compra creada con éxito'
+            ]);
 
         } catch (\Throwable $th) {
             DB::connection('mysql')->rollBack();
 
-            $error = true;
-            $mensaje = 'Error ' . $th->getMessage();
-        }
+            DB::table('logs_errores_bd')->insert([
+                'fecha_hora' => now(),
+                'usuario_bd' => DB::selectOne('SELECT CURRENT_USER() AS usuario')->usuario,
+                'procedimiento' => 'ComprasController@store',
+                'tabla_afectada' => 'compras / detalle_compras / productos / proveedores',
+                'accion' => 'INSERT',
+                'codigo_error' => $th->getCode(),
+                'mensaje_error' => $th->getMessage(),
+                'datos_referencia' => json_encode($request->all())
+            ]);
 
-        return Response::json([
-            'error' => $error,
-            'mensaje' => $mensaje
-        ]);
+            \Log::error('ERROR REAL AL REGISTRAR COMPRA', [
+                'mensaje' => $th->getMessage(),
+                'codigo' => $th->getCode(),
+                'archivo' => $th->getFile(),
+                'linea' => $th->getLine()
+            ]);
+
+            return response()->json([
+                'error' => true,
+                'mensaje' => $th->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy($id)
